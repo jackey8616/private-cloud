@@ -2,7 +2,7 @@ variable "pyfun-aws-ecr-image-sha" {
   type = string
 }
 variable "pyfun-aws-cert-key-path" {
-  type = string 
+  type = string
 }
 variable "pyfun-aws-cert-pem-path" {
   type = string
@@ -10,10 +10,10 @@ variable "pyfun-aws-cert-pem-path" {
 
 
 variable "seeker-gcp-project-id" {
-  type = string 
+  type        = string
   description = "GCP project id for Seeker"
 }
 variable "seeker-gcp-billing-account" {
-  type = string
+  type        = string
   description = "Billing Account id of GCP project Seeker"
 }

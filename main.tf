@@ -8,8 +8,8 @@ module "PyFun" {
 }
 
 module "Seeker" {
-  source = "./seeker"
-  gcp-project-id = var.seeker-gcp-project-id
+  source              = "./seeker"
+  gcp-project-id      = var.seeker-gcp-project-id
   gcp-billing-account = var.seeker-gcp-billing-account
 }
 
