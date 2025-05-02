@@ -13,6 +13,12 @@ module "Seeker" {
   gcp-billing-account = var.seeker-gcp-billing-account
 }
 
+module "FomoBot" {
+  source              = "./fomo-bot"
+  gcp-project-id      = var.fomo-bot-gcp-project-id
+  gcp-billing-account = var.fomo-bot-gcp-billing-account
+}
+
 resource "aws_servicecatalogappregistry_application" "terraform" {
   name = "terraform"
 }
