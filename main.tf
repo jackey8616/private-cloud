@@ -19,6 +19,12 @@ module "FomoBot" {
   gcp-billing-account = var.fomo-bot-gcp-billing-account
 }
 
+module "Morpheus" {
+  source = "./morpheus"
+  gcp-project-id = var.morpheus-gcp-project-id
+  gcp-billing-account = var.morpheus-gcp-billing-account
+}
+
 resource "aws_servicecatalogappregistry_application" "terraform" {
   name = "terraform"
 }

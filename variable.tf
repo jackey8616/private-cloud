@@ -18,6 +18,7 @@ variable "seeker-gcp-billing-account" {
   description = "Billing Account id of GCP project Seeker"
 }
 
+
 variable "fomo-bot-gcp-project-id" {
   type        = string
   description = "GCP project id for FomoBot"
@@ -26,4 +27,14 @@ variable "fomo-bot-gcp-project-id" {
 variable "fomo-bot-gcp-billing-account" {
   type        = string
   description = "Billing Account id of GCP project FomoBot"
+}
+
+
+variable "morpheus-gcp-project-id" {
+  type        = string
+  description = "GCP project id for Morpheus"
+}
+variable "morpheus-gcp-billing-account" {
+  type        = string
+  description = "Billing Account id of GCP project Morpheus"
 }
