@@ -15,3 +15,11 @@ resource "google_project_iam_binding" "vertex_ai_predictor_binding" {
     "serviceAccount:${google_service_account.morpheus-service-account.email}",
   ]
 }
+
+resource "google_project_iam_binding" "artifact_bucket_user" {
+  project = google_project.morpheus.project_id
+  role = "roles/storage.objectUser"
+  members = [
+    "serviceAccount:${google_service_account.morpheus-service-account.email}",
+  ]
+}
