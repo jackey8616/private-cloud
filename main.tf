@@ -20,8 +20,8 @@ module "FomoBot" {
 }
 
 module "Morpheus" {
-  source = "./morpheus"
-  gcp-project-id = var.morpheus-gcp-project-id
+  source              = "./morpheus"
+  gcp-project-id      = var.morpheus-gcp-project-id
   gcp-billing-account = var.morpheus-gcp-billing-account
 }
 
