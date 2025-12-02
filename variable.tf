@@ -38,3 +38,14 @@ variable "morpheus-gcp-billing-account" {
   type        = string
   description = "Billing Account id of GCP project Morpheus"
 }
+
+
+variable "groceries-nz-aws-ecr-image-sha" {
+  type        = string
+  description = "Image SHA in ECR"
+}
+
+variable "groceries-nz-lambda-env-postgresql" {
+  type        = string
+  description = "PostgreSQL URI for Lambda environment variable"
+}

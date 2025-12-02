@@ -1,0 +1,160 @@
+{
+  "Comment": "For single store from three major vendors ingesting all items",
+  "StartAt": "SetupGlobalConfig",
+  "States": {
+    "SetupGlobalConfig": {
+      "Type": "Pass",
+      "Parameters": {
+        "job_name.$": "$$.Execution.Name",
+        "store_id.$": "$.store_id",
+        "s3_bucket": "${s3_bucket_id}",
+        "s3_output_prefix.$": "States.Format('jobs/{}/', $$.Execution.Name)",
+        "paginator_folder_s3_key.$": "States.Format('jobs/{}/paginator/', $$.Execution.Name)",
+        "index_folder_s3_key.$": "States.Format('jobs/{}/indexing/', $$.Execution.Name)",
+        "merged_index_folder_s3_key.$": "States.Format('jobs/{}/merged_index/', $$.Execution.Name)",
+        "request_batch_size": 5
+      },
+      "ResultPath": "$.Config",
+      "Next": "L2CategoryDispatcher_GetCategories"
+    },
+    "L2CategoryDispatcher_GetCategories": {
+      "Type": "Task",
+      "Resource": "${l2_lambda_arn}",
+      "Parameters": {
+        "Config.$": "$.Config"
+      },
+      "ResultPath": "$.L2Data",
+      "Next": "L2Category_Mapping"
+    },
+    "L2Category_Mapping": {
+      "Type": "Map",
+      "Parameters": {
+        "Config.$": "$.Config",
+        "Category.$": "$$.Map.Item.Value.category",
+        "Store.$": "$$.Map.Item.Value.store"
+      },
+      "MaxConcurrency": 25,
+      "ItemsPath": "$.L2Data",
+      "ResultSelector": {
+        "Config.$": "States.ArrayGetItem(States.ArrayUnique($..Config), 0)",
+        "Store.$": "States.ArrayGetItem(States.ArrayUnique($..Store), 0)",
+        "L2Data.$": "States.ArrayUnique($..Category)"
+      },
+      "Next": "CategoryMapping",
+      "Iterator": {
+        "StartAt": "L3PaginatorDispatcher_GenerateRequests",
+        "States": {
+          "L3PaginatorDispatcher_GenerateRequests": {
+            "Type": "Task",
+            "Resource": "${l3_lambda_arn}",
+            "Parameters": {
+              "Config.$": "$.Config",
+              "Category.$": "$.Category",
+              "Store.$": "$.Store"
+            },
+            "ResultPath": "$.L3Data",
+            "Retry": [
+              {
+                "ErrorEquals": [ "HTTPError" ],
+                "MaxAttempts": 3,
+                "IntervalSeconds": 5,
+                "BackoffRate": 2.0
+              }
+            ],
+            "Next": "L3PaginatorDispatcher_RequestsMapping"
+          },
+          "L3PaginatorDispatcher_RequestsMapping": {
+            "Type": "Map",
+            "Parameters": {
+              "Config.$": "$.Config",
+              "Category.$": "$.Category",
+              "Store.$": "$.Store",
+              "Requests.$": "$$.Map.Item.Value.requests"
+            },
+            "MaxConcurrency": 25,
+            "ItemReader": {
+              "Resource": "arn:aws:states:::s3:getObject",
+              "Parameters": {
+                "Bucket.$": "$.Config.s3_bucket",
+                "Key.$": "$.L3Data.request_s3_file_key"
+              },
+              "ReaderConfig": {
+                "InputType": "JSON"
+              }
+            },
+            "ResultPath": null,
+            "End": true,
+            "ItemProcessor": {
+              "ProcessorConfig": {
+                "Mode": "DISTRIBUTED",
+                "ExecutionType": "STANDARD"
+              },
+              "StartAt": "L4ItemIndexer_Indexing",
+              "States": {
+                "L4ItemIndexer_Indexing": {
+                  "Type": "Task",
+                  "Resource": "${l4_lambda_arn}",
+                  "Parameters": {
+                    "Config.$": "$.Config",
+                    "Store.$": "$.Store",
+                    "Requests.$": "$.Requests",
+                    "Category.$": "$.Category"
+                  },
+                  "ResultPath": "$.L4Data",
+                  "Retry": [
+                    {
+                      "ErrorEquals": [ "HTTPError" ],
+                      "MaxAttempts": 4,
+                      "IntervalSeconds": 4,
+                      "BackoffRate": 3.0
+                    }
+                  ],
+                  "End": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "CategoryMapping": {
+      "Type": "Map",
+      "Parameters": {
+        "Config.$": "$.Config",
+        "Category.$": "$$.Map.Item.Value",
+        "Store.$": "$.Store"
+      },
+      "MaxConcurrency": 25,
+      "ItemsPath": "$.L2Data",
+      "ResultPath": null,
+      "Next": "ExecutionSucceed",
+      "Iterator": {
+        "StartAt": "L5ItemAggregator_Aggregate",
+        "States": {
+          "L5ItemAggregator_Aggregate": {
+            "Type": "Task",
+            "Resource": "${l5_lambda_arn}",
+            "Parameters": {
+              "Config.$": "$.Config",
+              "Store.$": "$.Store",
+              "Category.$": "$.Category"
+            },
+            "ResultPath": "$.L5Data",
+            "Next": "L6ItemCopier_Copy"
+          },
+          "L6ItemCopier_Copy": {
+            "Type": "Task",
+            "Resource": "${l6_lambda_arn}",
+            "Parameters": {
+              "Config.$": "$.Config"
+            },
+            "End": true
+          }
+        }
+      }
+    },
+    "ExecutionSucceed": {
+      "Type": "Succeed"
+    }
+  }
+}

@@ -25,6 +25,17 @@ module "Morpheus" {
   gcp-billing-account = var.morpheus-gcp-billing-account
 }
 
+module "GroceriesNZ" {
+  source                             = "./groceries_nz"
+  GitHub-OIDC-Arn                    = aws_iam_openid_connect_provider.GitHub.arn
+  Lambda-EdgeFunctionExecuteRole-Arn = aws_iam_policy.AWSLambdaEdgeExecutionRole.arn
+  Lambda-PostgreSQL-Env              = var.groceries-nz-lambda-env-postgresql
+  ECR-Image-Sha                      = var.groceries-nz-aws-ecr-image-sha
+  providers = {
+    aws = aws.sydney
+  }
+}
+
 resource "aws_servicecatalogappregistry_application" "terraform" {
   name = "terraform"
 }
