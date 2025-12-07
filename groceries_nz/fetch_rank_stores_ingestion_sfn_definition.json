@@ -1,0 +1,38 @@
+{
+  "Comment": "For fetching all stores base on fetch rank in database and delegate to SingleStoreIngestion workflow",
+  "StartAt": "L1StoreDispatcher_GetStores",
+  "States": {
+    "L1StoreDispatcher_GetStores": {
+      "Type": "Task",
+      "Resource": "${l1_lambda_arn}",
+      "ResultPath": "$.L1Data",
+      "Next": "L1Store_Mapping"
+    },
+    "L1Store_Mapping": {
+      "Type": "Map",
+      "Parameters": {
+        "Store.$": "$$.Map.Item.Value"
+      },
+      "MaxConcurrency": 10,
+      "ItemsPath": "$.L1Data",
+      "Next": "ExecutionSucceed",
+      "Iterator": {
+        "StartAt": "SingleStoreIngestion",
+        "States": {
+          "SingleStoreIngestion": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::states:startExecution",
+            "Parameters": {
+              "StateMachineArn": "${single_store_ingestion_arn}",
+              "Input.$": "$.Store"
+            },
+            "End": true
+          }
+        }
+      }
+    },
+    "ExecutionSucceed": {
+      "Type": "Succeed"
+    }
+  }
+}

@@ -1,7 +1,26 @@
 {
   "Comment": "For single store from three major vendors ingesting all items",
-  "StartAt": "SetupGlobalConfig",
+  "StartAt": "DefineDefaults",
   "States": {
+    "DefineDefaults": {
+      "Type": "Pass",
+      "Next": "ApplyDefaults",
+      "ResultPath": "$.inputDefaults",
+      "Parameters": {
+        "include_categories": null,
+        "max_page_per_category_count": null,
+        "max_item_per_page_count": null
+      }
+    },
+    "ApplyDefaults": {
+      "Type": "Pass",
+      "Next": "SetupGlobalConfig",
+      "ResultPath": "$.withDefaults",
+      "OutputPath": "$.withDefaults.args",
+      "Parameters": {
+        "args.$": "States.JsonMerge($.inputDefaults, $$.Execution.Input, false)"
+      }
+    },
     "SetupGlobalConfig": {
       "Type": "Pass",
       "Parameters": {
@@ -12,7 +31,10 @@
         "paginator_folder_s3_key.$": "States.Format('jobs/{}/paginator/', $$.Execution.Name)",
         "index_folder_s3_key.$": "States.Format('jobs/{}/indexing/', $$.Execution.Name)",
         "merged_index_folder_s3_key.$": "States.Format('jobs/{}/merged_index/', $$.Execution.Name)",
-        "request_batch_size": 5
+        "request_batch_size": 5,
+        "include_categories.$": "$.include_categories",
+        "max_page_per_category_count.$": "$.max_page_per_category_count",
+        "max_item_per_page_count.$": "$.max_item_per_page_count"
       },
       "ResultPath": "$.Config",
       "Next": "L2CategoryDispatcher_GetCategories"

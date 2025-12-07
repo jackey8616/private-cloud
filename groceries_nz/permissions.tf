@@ -157,8 +157,8 @@ data "aws_iam_policy_document" "sfn_assume_role" {
   }
 }
 
-resource "aws_iam_role" "sfn_execution_role" {
-  name               = "sfn-groceries-nz-executor"
+resource "aws_iam_role" "single_store_ingestion_sfn_execution_role" {
+  name               = "single-store-ingestion-sfn-groceries-nz-executor"
   assume_role_policy = data.aws_iam_policy_document.sfn_assume_role.json
 
   tags = merge(aws_servicecatalogappregistry_application.groceries_nz.application_tag)
@@ -166,7 +166,7 @@ resource "aws_iam_role" "sfn_execution_role" {
   tags_all = merge(aws_servicecatalogappregistry_application.groceries_nz.application_tag)
 }
 
-data "aws_iam_policy_document" "sfn_policy" {
+data "aws_iam_policy_document" "single_store_ingestion_sfn_policy" {
   statement {
     effect = "Allow"
     actions = ["lambda:InvokeFunction"]
@@ -221,13 +221,70 @@ data "aws_iam_policy_document" "sfn_policy" {
       "logs:PutLogEvents",
     ]
     resources = [
-      "${aws_cloudwatch_log_group.sfn_log_group.arn}:*",
+      "${aws_cloudwatch_log_group.single_store_ingestion_sfn_log_group.arn}:*",
     ]
   }
 }
 
-resource "aws_iam_role_policy" "sfn_exec_policy" {
-  name   = "sfn-groceries-nz-execution-policy"
-  role   = aws_iam_role.sfn_execution_role.id
-  policy = data.aws_iam_policy_document.sfn_policy.json
+resource "aws_iam_role_policy" "single_store_ingestion_sfn_exec_policy" {
+  name   = "single-store-ingestion-sfn-groceries-nz-execution-policy"
+  role   = aws_iam_role.single_store_ingestion_sfn_execution_role.id
+  policy = data.aws_iam_policy_document.single_store_ingestion_sfn_policy.json
+}
+
+resource "aws_iam_role" "fetch_rank_stores_ingestion_sfn_execution_role" {
+  name               = "fetch-rank-stores-ingestion-sfn-groceries-nz-executor"
+  assume_role_policy = data.aws_iam_policy_document.sfn_assume_role.json
+
+  tags = merge(aws_servicecatalogappregistry_application.groceries_nz.application_tag)
+
+  tags_all = merge(aws_servicecatalogappregistry_application.groceries_nz.application_tag)
+}
+
+data "aws_iam_policy_document" "fetch_rank_stores_ingestion_sfn_policy" {
+  statement {
+    effect = "Allow"
+    actions = ["lambda:InvokeFunction"]
+    resources = [aws_lambda_function.level_1_store_dispatcher.arn]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = ["states:StartExecution"] 
+    resources = [
+      "arn:aws:states:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:stateMachine:${aws_sfn_state_machine.single_store_ingestion.name}",
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogDelivery",
+      "logs:GetLogDelivery",
+      "logs:UpdateLogDelivery",
+      "logs:DeleteLogDelivery",
+      "logs:ListLogDeliveries",
+      "logs:PutResourcePolicy",
+      "logs:DescribeResourcePolicies",
+      "logs:DescribeLogGroups",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions   = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+    resources = [
+      "${aws_cloudwatch_log_group.fetch_rank_stores_ingestion_sfn_log_group.arn}:*",
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "fetch_rank_stores_ingestion_sfn_exec_policy" {
+  name   = "fetch-rank-stores-ingestion-sfn-groceries-nz-execution-policy"
+  role   = aws_iam_role.fetch_rank_stores_ingestion_sfn_execution_role.id
+  policy = data.aws_iam_policy_document.fetch_rank_stores_ingestion_sfn_policy.json
 }
