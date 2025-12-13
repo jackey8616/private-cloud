@@ -33,7 +33,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "groceries-ingestion-data" {
     filter {}
 
     expiration {
-      days = 7
+      days = 1
     }
 
     status = "Enabled"

@@ -21,11 +21,12 @@
         "States": {
           "SingleStoreIngestion": {
             "Type": "Task",
-            "Resource": "arn:aws:states:::states:startExecution",
+            "Resource": "arn:aws:states:::states:startExecution.sync",
             "Parameters": {
               "StateMachineArn": "${single_store_ingestion_arn}",
               "Input.$": "$.Store"
             },
+            "ResultPath": "$.IngestionResult",
             "End": true
           }
         }

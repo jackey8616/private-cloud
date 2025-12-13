@@ -250,9 +250,33 @@ data "aws_iam_policy_document" "fetch_rank_stores_ingestion_sfn_policy" {
 
   statement {
     effect = "Allow"
-    actions = ["states:StartExecution"] 
+    actions = ["states:StartExecution"]
     resources = [
       "arn:aws:states:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:stateMachine:${aws_sfn_state_machine.single_store_ingestion.name}",
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "states:DescribeExecution",
+      "states:StopExecution",
+    ]
+    resources = [
+      "arn:aws:states:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:execution:${aws_sfn_state_machine.single_store_ingestion.name}:*",
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "events:PutTargets",
+      "events:PutRule",
+      "events:DescribeRule",
+      "events:DeleteRule",
+      "events:RemoveTargets"
+    ]
+    resources = [
+      "arn:aws:events:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rule/StepFunctionsGetEventsForStepFunctionsExecutionRule"
     ]
   }
 
@@ -287,4 +311,37 @@ resource "aws_iam_role_policy" "fetch_rank_stores_ingestion_sfn_exec_policy" {
   name   = "fetch-rank-stores-ingestion-sfn-groceries-nz-execution-policy"
   role   = aws_iam_role.fetch_rank_stores_ingestion_sfn_execution_role.id
   policy = data.aws_iam_policy_document.fetch_rank_stores_ingestion_sfn_policy.json
+}
+
+data "aws_iam_policy_document" "eventbridge_assume_role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type ="Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "eventbridge_sfn_invocation_role" {
+  name = "eventbridge-sfn-invocation-role"  
+  assume_role_policy = data.aws_iam_policy_document.eventbridge_assume_role.json
+
+  tags = merge(aws_servicecatalogappregistry_application.groceries_nz.application_tag)
+
+  tags_all = merge(aws_servicecatalogappregistry_application.groceries_nz.application_tag)
+}
+
+data "aws_iam_policy_document" "eventbridge-execute-sfn-policy" {
+  statement {
+    effect = "Allow"
+    actions = ["states:StartExecution"]
+    resources = [aws_sfn_state_machine.fetch_rank_stores_ingestion.arn]
+  }
+}
+resource "aws_iam_role_policy" "eventbridge_sfn_exec_policy" {
+  name = "start-sfn-policy"
+  role = aws_iam_role.eventbridge_sfn_invocation_role.id
+  policy = data.aws_iam_policy_document.eventbridge-execute-sfn-policy.json
 }
