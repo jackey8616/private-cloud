@@ -245,7 +245,10 @@ data "aws_iam_policy_document" "fetch_rank_stores_ingestion_sfn_policy" {
   statement {
     effect = "Allow"
     actions = ["lambda:InvokeFunction"]
-    resources = [aws_lambda_function.level_1_store_dispatcher.arn]
+    resources = [
+      aws_lambda_function.level_1_store_dispatcher.arn,
+      aws_lambda_function.view_updater.arn,
+    ]
   }
 
   statement {

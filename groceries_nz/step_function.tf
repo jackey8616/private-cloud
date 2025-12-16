@@ -10,6 +10,7 @@ locals {
   fetch_rank_stores_ingestion_sfn_asl = templatefile("${path.module}/fetch_rank_stores_ingestion_sfn_definition.json", {
     single_store_ingestion_arn = aws_sfn_state_machine.single_store_ingestion.arn
     l1_lambda_arn  = aws_lambda_function.level_1_store_dispatcher.arn
+    view_updater_arn = aws_lambda_function.view_updater.arn
   })
 }
 

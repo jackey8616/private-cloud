@@ -26,11 +26,6 @@ resource "aws_lambda_function" "level_1_store_dispatcher" {
     size = 512
   }
 
-  logging_config {
-    log_format = "Text"
-    log_group = "/aws/lambda/groceries-nz/level_1_store_dispatcher"
-  }
-
   tracing_config {
     mode = "PassThrough"
   }
@@ -66,11 +61,6 @@ resource "aws_lambda_function" "level_2_category_dispatcher" {
 
   ephemeral_storage {
     size = 512
-  }
-
-  logging_config {
-    log_format = "Text"
-    log_group = "/aws/lambda/groceries-nz/level_2_category_dispatcher"
   }
 
   tracing_config {
@@ -110,11 +100,6 @@ resource "aws_lambda_function" "level_3_paginator_dispatcher" {
     size = 512
   }
 
-  logging_config {
-    log_format = "Text"
-    log_group = "/aws/lambda/groceries-nz/level_3_paginator_dispatcher"
-  }
-
   tracing_config {
     mode = "PassThrough"
   }
@@ -150,11 +135,6 @@ resource "aws_lambda_function" "level_4_item_indexer" {
 
   ephemeral_storage {
     size = 512
-  }
-
-  logging_config {
-    log_format = "Text"
-    log_group = "/aws/lambda/groceries-nz/level_4_item_indexer"
   }
 
   tracing_config {
@@ -194,11 +174,6 @@ resource "aws_lambda_function" "level_5_item_aggregator" {
     size = 512
   }
 
-  logging_config {
-    log_format = "Text"
-    log_group = "/aws/lambda/groceries-nz/level_5_item_aggregator"
-  }
-
   tracing_config {
     mode = "PassThrough"
   }
@@ -207,7 +182,6 @@ resource "aws_lambda_function" "level_5_item_aggregator" {
 
   tags_all = merge(aws_servicecatalogappregistry_application.groceries_nz.application_tag)
 }
-
 
 resource "aws_lambda_function" "level_6_item_copier" {
   role = aws_iam_role.lambda-groceries-nz.arn
@@ -237,9 +211,41 @@ resource "aws_lambda_function" "level_6_item_copier" {
     size = 512
   }
 
-  logging_config {
-    log_format = "Text"
-    log_group = "/aws/lambda/groceries-nz/level_6_item_copier"
+  tracing_config {
+    mode = "PassThrough"
+  }
+
+  tags = merge(aws_servicecatalogappregistry_application.groceries_nz.application_tag)
+
+  tags_all = merge(aws_servicecatalogappregistry_application.groceries_nz.application_tag)
+}
+
+resource "aws_lambda_function" "view_updater" {
+  role = aws_iam_role.lambda-groceries-nz.arn
+  image_uri = "${aws_ecr_repository.GroceriesNZ-Lambda.repository_url}@${var.ECR-Image-Sha}"
+  package_type = "Image"
+  function_name = "view_updater"
+
+  image_config {
+    entry_point = []
+    command = ["lambda_handlers.view_updater.handler"]
+  }
+
+  environment {
+    variables = {
+      S3_BUCKET_NAME = aws_s3_bucket.groceries-ingestion-data.id
+      DATABASE_URL = var.Lambda-PostgreSQL-Env
+    }
+  }
+
+  timeout = 900
+
+  layers = []
+
+  architectures = ["x86_64"]
+
+  ephemeral_storage {
+    size = 512
   }
 
   tracing_config {

@@ -15,7 +15,7 @@
       },
       "MaxConcurrency": 10,
       "ItemsPath": "$.L1Data",
-      "Next": "ExecutionSucceed",
+      "Next": "View_Refresh",
       "Iterator": {
         "StartAt": "SingleStoreIngestion",
         "States": {
@@ -31,6 +31,11 @@
           }
         }
       }
+    },
+    "View_Refresh": {
+      "Type": "Task",
+      "Resource": "${view_updater_arn}",
+      "Next": "ExecutionSucceed"
     },
     "ExecutionSucceed": {
       "Type": "Succeed"
