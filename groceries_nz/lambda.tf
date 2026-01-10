@@ -164,6 +164,7 @@ resource "aws_lambda_function" "level_5_item_aggregator" {
     }
   }
 
+  memory_size = 1024
   timeout = 900
 
   layers = []

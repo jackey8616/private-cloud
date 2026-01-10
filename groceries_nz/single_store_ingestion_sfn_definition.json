@@ -59,10 +59,9 @@
       "ItemsPath": "$.L2Data",
       "ResultSelector": {
         "Config.$": "States.ArrayGetItem(States.ArrayUnique($..Config), 0)",
-        "Store.$": "States.ArrayGetItem(States.ArrayUnique($..Store), 0)",
-        "L2Data.$": "States.ArrayUnique($..Category)"
+        "Store.$": "States.ArrayGetItem(States.ArrayUnique($..Store), 0)"
       },
-      "Next": "CategoryMapping",
+      "Next": "L5ItemAggregator_Aggregate",
       "Iterator": {
         "StartAt": "L3PaginatorDispatcher_GenerateRequests",
         "States": {
@@ -139,41 +138,24 @@
         }
       }
     },
-    "CategoryMapping": {
-      "Type": "Map",
+    "L5ItemAggregator_Aggregate": {
+      "Type": "Task",
+      "Resource": "${l5_lambda_arn}",
       "Parameters": {
         "Config.$": "$.Config",
-        "Category.$": "$$.Map.Item.Value",
         "Store.$": "$.Store"
       },
-      "MaxConcurrency": 25,
-      "ItemsPath": "$.L2Data",
-      "ResultPath": null,
-      "Next": "ExecutionSucceed",
-      "Iterator": {
-        "StartAt": "L5ItemAggregator_Aggregate",
-        "States": {
-          "L5ItemAggregator_Aggregate": {
-            "Type": "Task",
-            "Resource": "${l5_lambda_arn}",
-            "Parameters": {
-              "Config.$": "$.Config",
-              "Store.$": "$.Store",
-              "Category.$": "$.Category"
-            },
-            "ResultPath": "$.L5Data",
-            "Next": "L6ItemCopier_Copy"
-          },
-          "L6ItemCopier_Copy": {
-            "Type": "Task",
-            "Resource": "${l6_lambda_arn}",
-            "Parameters": {
-              "Config.$": "$.Config"
-            },
-            "End": true
-          }
-        }
-      }
+      "ResultPath": "$.L5Data",
+      "Next": "L6ItemCopier_Copy"
+    },
+    "L6ItemCopier_Copy": {
+      "Type": "Task",
+      "Resource": "${l6_lambda_arn}",
+      "Parameters": {
+        "Config.$": "$.Config",
+        "Store.$": "$.Store"
+      },
+      "Next": "ExecutionSucceed"
     },
     "ExecutionSucceed": {
       "Type": "Succeed"
