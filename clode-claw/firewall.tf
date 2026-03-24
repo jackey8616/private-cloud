@@ -14,7 +14,7 @@ resource "linode_firewall" "openclaw_sg_fw" {
     label    = "allow-ui-taiwan"
     action   = "ACCEPT"
     protocol = "TCP"
-    ports    = "18789"
+    ports    = "80,443"
     ipv4     = var.allowed_connection_ips
   }
 
