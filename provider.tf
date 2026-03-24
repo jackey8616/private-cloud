@@ -9,3 +9,7 @@ provider "aws" {
   alias                    = "sydney"
   shared_credentials_files = [".aws_credentials"]
 }
+
+provider "linode" {
+  token = var.linode-token
+}

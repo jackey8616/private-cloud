@@ -4,6 +4,11 @@ terraform {
       source  = "hashicorp/aws"
       version = "5.46.0"
     }
+
+    linode = {
+      source = "linode/linode"
+      version = "3.10.0"
+    }
   }
 
   backend "s3" {

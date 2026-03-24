@@ -36,6 +36,17 @@ module "GroceriesNZ" {
   }
 }
 
+module "ClodeClaw" {
+  source = "./clode-claw"
+  ssh_public_keys = [
+    linode_sshkey.MacBookAir.ssh_key
+  ]
+  instance_root_password = var.clode-claw-instance-default-root-password
+  providers = {
+    linode = linode
+  }
+}
+
 resource "aws_servicecatalogappregistry_application" "terraform" {
   name = "terraform"
 }

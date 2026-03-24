@@ -1,3 +1,9 @@
+variable "linode-token" {
+  type = string
+  sensitive = true
+}
+
+
 variable "pyfun-aws-ecr-image-sha" {
   type = string
 }
@@ -48,4 +54,12 @@ variable "groceries-nz-aws-ecr-image-sha" {
 variable "groceries-nz-lambda-env-postgresql" {
   type        = string
   description = "PostgreSQL URI for Lambda environment variable"
+  sensitive = true
+}
+
+
+variable "clode-claw-instance-default-root-password" {
+  type = string
+  description = "Default Instance root password"
+  sensitive = true
 }
