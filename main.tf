@@ -42,6 +42,7 @@ module "ClodeClaw" {
     linode_sshkey.MacBookAir.ssh_key
   ]
   instance_root_password = var.clode-claw-instance-default-root-password
+  allowed_connection_ips = var.often-login-ips
   providers = {
     linode = linode
   }

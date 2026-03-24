@@ -1,5 +1,5 @@
 resource "linode_instance" "openclaw_server" {
-  label           = "openclaw-gateway"
+  label           = "openclaw"
   image           = "linode/ubuntu24.04"
   region          = linode_vpc.openclaw_sg_vpc.region
   type            = "g6-standard-1" # Linode SharedCPU 2GB RAM

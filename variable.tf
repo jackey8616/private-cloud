@@ -2,6 +2,12 @@ variable "linode-token" {
   type = string
   sensitive = true
 }
+variable "often-login-ips" {
+  type = list(string)
+  default = [
+    "1.170.158.133/32"
+  ]
+}
 
 
 variable "pyfun-aws-ecr-image-sha" {
