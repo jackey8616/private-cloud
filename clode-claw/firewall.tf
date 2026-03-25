@@ -15,6 +15,23 @@ resource "linode_firewall" "openclaw_sg_fw" {
     action   = "ACCEPT"
     protocol = "TCP"
     ports    = "80,443"
+    # ipv4     = var.allowed_connection_ips
+    ipv4 = ["0.0.0.0/0"]
+  }
+
+  inbound {
+    label    = "allow-obsidian-taiwan-TCP"
+    action   = "ACCEPT"
+    protocol = "TCP"
+    ports    = "22000"
+    ipv4     = var.allowed_connection_ips
+  }
+
+  inbound {
+    label    = "allow-obsidian-taiwan-UDP"
+    action   = "ACCEPT"
+    protocol = "UDP"
+    ports    = "21027"
     ipv4     = var.allowed_connection_ips
   }
 

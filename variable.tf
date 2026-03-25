@@ -5,7 +5,7 @@ variable "linode-token" {
 variable "often-login-ips" {
   type = list(string)
   default = [
-    "1.170.158.133/32"
+    "61.224.194.18/32"
   ]
 }
 
