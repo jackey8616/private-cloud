@@ -1,7 +1,7 @@
 resource "aws_cloudwatch_event_rule" "daily_schedule_rule" {
   name                = "daily-sfn-trigger"
   description         = "每日 UTC 時間 18:00(NZ 07:00) 觸發 Step Function"
-  schedule_expression = "cron(0 18 * * ? *)" 
+  schedule_expression = "cron(0 18 * * ? *)"
 
   tags = merge(aws_servicecatalogappregistry_application.groceries_nz.application_tag)
 

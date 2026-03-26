@@ -25,7 +25,7 @@ data "aws_iam_policy_document" "ECR-Push-GroceriesNZ-Lambda" {
 }
 
 resource "aws_iam_policy" "ECR-Push-GroceriesNZ-Lambda" {
-  name = "ECR-Push-GroceriesNZ-Lambda"
+  name   = "ECR-Push-GroceriesNZ-Lambda"
   policy = data.aws_iam_policy_document.ECR-Push-GroceriesNZ-Lambda.json
 
   tags = merge(aws_servicecatalogappregistry_application.groceries_nz.application_tag)
@@ -70,8 +70,8 @@ data "aws_iam_policy_document" "lambda-groceries-nz-s3-policy" {
 }
 
 resource "aws_iam_policy" "lambda-groceries-nz-s3-policy" {
-  name        = "lambda-groceries-nz-s3-policy"
-  policy      = data.aws_iam_policy_document.lambda-groceries-nz-s3-policy.json
+  name   = "lambda-groceries-nz-s3-policy"
+  policy = data.aws_iam_policy_document.lambda-groceries-nz-s3-policy.json
 
   tags = merge(aws_servicecatalogappregistry_application.groceries_nz.application_tag)
 
@@ -95,8 +95,8 @@ data "aws_iam_policy_document" "lambda-groceries-nz" {
 }
 
 resource "aws_iam_role" "lambda-groceries-nz" {
-  name = "lambda-groceries-nz"
-  path = "/service-role/"
+  name               = "lambda-groceries-nz"
+  path               = "/service-role/"
   assume_role_policy = data.aws_iam_policy_document.lambda-groceries-nz.json
   managed_policy_arns = [
     var.Lambda-EdgeFunctionExecuteRole-Arn,
@@ -142,8 +142,8 @@ resource "aws_iam_role" "Groceries-NZ-GH-Idp-Role" {
 }
 
 resource "aws_iam_role_policy_attachment" "Groceries-NZ-GH-ECR-Attachment" {
-  role       = aws_iam_role.Groceries-NZ-GH-Idp-Role.name 
-  
+  role = aws_iam_role.Groceries-NZ-GH-Idp-Role.name
+
   policy_arn = aws_iam_policy.ECR-Push-GroceriesNZ-Lambda.arn
 }
 
@@ -168,7 +168,7 @@ resource "aws_iam_role" "single_store_ingestion_sfn_execution_role" {
 
 data "aws_iam_policy_document" "single_store_ingestion_sfn_policy" {
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = ["lambda:InvokeFunction"]
     resources = [
       aws_lambda_function.level_2_category_dispatcher.arn,
@@ -180,21 +180,21 @@ data "aws_iam_policy_document" "single_store_ingestion_sfn_policy" {
   }
 
   statement {
-    effect = "Allow"
-    actions = ["states:StartExecution"] 
+    effect  = "Allow"
+    actions = ["states:StartExecution"]
     resources = [
       "arn:aws:states:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:stateMachine:${aws_sfn_state_machine.single_store_ingestion.name}",
     ]
   }
 
   statement {
-    effect = "Allow"
+    effect    = "Allow"
     actions   = ["s3:GetObject", "s3:GetObjectAcl"]
     resources = ["arn:aws:s3:::${aws_s3_bucket.groceries-ingestion-data.id}/*"]
   }
 
   statement {
-    effect = "Allow"
+    effect    = "Allow"
     actions   = ["s3:PutObject", "s3:PutObjectAcl"]
     resources = ["arn:aws:s3:::${aws_s3_bucket.groceries-ingestion-data.id}/sfn-output/*"]
   }
@@ -216,7 +216,7 @@ data "aws_iam_policy_document" "single_store_ingestion_sfn_policy" {
 
   statement {
     effect = "Allow"
-    actions   = [
+    actions = [
       "logs:CreateLogStream",
       "logs:PutLogEvents",
     ]
@@ -243,7 +243,7 @@ resource "aws_iam_role" "fetch_rank_stores_ingestion_sfn_execution_role" {
 
 data "aws_iam_policy_document" "fetch_rank_stores_ingestion_sfn_policy" {
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = ["lambda:InvokeFunction"]
     resources = [
       aws_lambda_function.level_1_store_dispatcher.arn,
@@ -252,7 +252,7 @@ data "aws_iam_policy_document" "fetch_rank_stores_ingestion_sfn_policy" {
   }
 
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = ["states:StartExecution"]
     resources = [
       "arn:aws:states:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:stateMachine:${aws_sfn_state_machine.single_store_ingestion.name}",
@@ -300,7 +300,7 @@ data "aws_iam_policy_document" "fetch_rank_stores_ingestion_sfn_policy" {
 
   statement {
     effect = "Allow"
-    actions   = [
+    actions = [
       "logs:CreateLogStream",
       "logs:PutLogEvents",
     ]
@@ -321,14 +321,14 @@ data "aws_iam_policy_document" "eventbridge_assume_role" {
     actions = ["sts:AssumeRole"]
 
     principals {
-      type ="Service"
+      type        = "Service"
       identifiers = ["events.amazonaws.com"]
     }
   }
 }
 
 resource "aws_iam_role" "eventbridge_sfn_invocation_role" {
-  name = "eventbridge-sfn-invocation-role"  
+  name               = "eventbridge-sfn-invocation-role"
   assume_role_policy = data.aws_iam_policy_document.eventbridge_assume_role.json
 
   tags = merge(aws_servicecatalogappregistry_application.groceries_nz.application_tag)
@@ -338,13 +338,13 @@ resource "aws_iam_role" "eventbridge_sfn_invocation_role" {
 
 data "aws_iam_policy_document" "eventbridge-execute-sfn-policy" {
   statement {
-    effect = "Allow"
-    actions = ["states:StartExecution"]
+    effect    = "Allow"
+    actions   = ["states:StartExecution"]
     resources = [aws_sfn_state_machine.fetch_rank_stores_ingestion.arn]
   }
 }
 resource "aws_iam_role_policy" "eventbridge_sfn_exec_policy" {
-  name = "start-sfn-policy"
-  role = aws_iam_role.eventbridge_sfn_invocation_role.id
+  name   = "start-sfn-policy"
+  role   = aws_iam_role.eventbridge_sfn_invocation_role.id
   policy = data.aws_iam_policy_document.eventbridge-execute-sfn-policy.json
 }

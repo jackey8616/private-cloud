@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     cloudflare = {
-      source = "cloudflare/cloudflare"
+      source  = "cloudflare/cloudflare"
       version = "~>5"
     }
 
@@ -11,7 +11,7 @@ terraform {
     }
 
     linode = {
-      source = "linode/linode"
+      source  = "linode/linode"
       version = "3.10.0"
     }
   }

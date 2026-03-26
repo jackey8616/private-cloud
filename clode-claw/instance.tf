@@ -7,7 +7,7 @@ resource "linode_instance" "openclaw_server" {
   root_pass       = var.instance_root_password
 
   interface {
-    purpose   = "public"
+    purpose = "public"
   }
 
   interface {

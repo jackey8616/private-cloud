@@ -8,7 +8,7 @@ resource "aws_ecr_repository" "GroceriesNZ-Lambda" {
 
 resource "aws_s3_bucket" "groceries-ingestion-data" {
   bucket = "groceries-ingestion-data"
-  tags = merge(aws_servicecatalogappregistry_application.groceries_nz.application_tag)
+  tags   = merge(aws_servicecatalogappregistry_application.groceries_nz.application_tag)
 
   tags_all = merge(aws_servicecatalogappregistry_application.groceries_nz.application_tag)
 }
@@ -20,7 +20,7 @@ resource "aws_s3_bucket_cors_configuration" "groceries-ingestion-data" {
     allowed_headers = ["*"]
     allowed_origins = ["*"]
     allowed_methods = ["GET", "POST", "PUT", "DELETE"]
-    expose_headers = ["ETag"]
+    expose_headers  = ["ETag"]
   }
 }
 

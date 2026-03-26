@@ -7,7 +7,7 @@ variable "Lambda-EdgeFunctionExecuteRole-Arn" {
 }
 
 variable "Lambda-PostgreSQL-Env" {
-  type = string 
+  type = string
 }
 
 variable "ECR-Image-Sha" {

@@ -1,6 +1,6 @@
 resource "linode_firewall" "openclaw_sg_fw" {
-  label = "openclaw-sg-firewall"
-  linodes         = [linode_instance.openclaw_server.id]
+  label   = "openclaw-sg-firewall"
+  linodes = [linode_instance.openclaw_server.id]
 
   inbound {
     label    = "allow-ssh-taiwan"
@@ -35,6 +35,6 @@ resource "linode_firewall" "openclaw_sg_fw" {
     ipv4     = var.allowed_connection_ips
   }
 
-  inbound_policy = "DROP"
+  inbound_policy  = "DROP"
   outbound_policy = "ACCEPT"
 }

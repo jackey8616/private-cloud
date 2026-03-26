@@ -1,10 +1,10 @@
 variable "cf-token" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "linode-token" {
-  type = string
+  type      = string
   sensitive = true
 }
 variable "often-login-ips" {
@@ -65,12 +65,12 @@ variable "groceries-nz-aws-ecr-image-sha" {
 variable "groceries-nz-lambda-env-postgresql" {
   type        = string
   description = "PostgreSQL URI for Lambda environment variable"
-  sensitive = true
+  sensitive   = true
 }
 
 
 variable "clode-claw-instance-default-root-password" {
-  type = string
+  type        = string
   description = "Default Instance root password"
-  sensitive = true
+  sensitive   = true
 }

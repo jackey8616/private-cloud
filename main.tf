@@ -1,6 +1,6 @@
 module "DNS" {
-  source = "./dns" 
-  ip = module.ClodeClaw.public_ipv4
+  source = "./dns"
+  ip     = module.ClodeClaw.public_ipv4
 }
 module "PyFun" {
   source                             = "./pyfun"
