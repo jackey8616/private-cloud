@@ -1,3 +1,7 @@
+module "DNS" {
+  source = "./dns" 
+  ip = module.ClodeClaw.public_ipv4
+}
 module "PyFun" {
   source                             = "./pyfun"
   GitHub-OIDC-Arn                    = aws_iam_openid_connect_provider.GitHub.arn

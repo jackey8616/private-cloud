@@ -1,3 +1,8 @@
+variable "cf-token" {
+  type = string
+  sensitive = true
+}
+
 variable "linode-token" {
   type = string
   sensitive = true
