@@ -47,7 +47,8 @@ module "ClodeClaw" {
   ssh_public_keys = [
     linode_sshkey.MacBookAir.ssh_key
   ]
-  instance_root_password = var.clode-claw-instance-default-root-password
+  instance_root_password = var.clode-claw.instance-default-root-password
+  instance-env           = var.clode-claw.instance-env
   allowed_connection_ips = var.often-login-ips
   providers = {
     cloudflare = cloudflare

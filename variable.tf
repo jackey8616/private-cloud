@@ -70,8 +70,17 @@ variable "groceries-nz-lambda-env-postgresql" {
 }
 
 
-variable "clode-claw-instance-default-root-password" {
-  type        = string
-  description = "Default Instance root password"
-  sensitive   = true
+variable "clode-claw" {
+  type = object({
+    instance-default-root-password = string
+    instance-env = object({
+      agent_user         = string
+      discord_bot_token  = string
+      claude_oauth_token = string
+      timezone           = string
+      repo_url           = string
+      gh_token           = optional(string, "")
+    })
+  })
+  sensitive = true
 }

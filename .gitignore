@@ -1,4 +1,4 @@
 .terraform/
 
 .aws_credentials
-terraform.tfvars
+terraform.tfvars*
