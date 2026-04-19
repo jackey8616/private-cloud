@@ -26,15 +26,6 @@ resource "cloudflare_account_token" "vps-token" {
   name       = "vps-token"
   policies   = local.token_policies
 }
-output "vps_secret_access_key" {
-  value     = sha256(cloudflare_account_token.vps-token.value)
-  sensitive = true
-}
-output "vps_access_key_id" {
-  value     = cloudflare_account_token.vps-token.id
-  sensitive = true
-}
-
 
 resource "cloudflare_account_token" "rowan-mba-token" {
   account_id = var.cf-account-id

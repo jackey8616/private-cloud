@@ -6,14 +6,6 @@ output "dynamodb_table_name" {
   value = aws_dynamodb_table.terraform_state_lock.name
 }
 
-output "vps_secret_access_key" {
-  value     = module.ClodeClaw.vps_secret_access_key
-  sensitive = true
-}
-output "vps_access_key_id" {
-  value     = module.ClodeClaw.vps_access_key_id
-  sensitive = true
-}
 output "rowan_mba_secret_access_key" {
   value     = module.ClodeClaw.rowan_mba_secret_access_key
   sensitive = true
