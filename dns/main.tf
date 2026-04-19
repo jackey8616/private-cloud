@@ -1,6 +1,6 @@
 resource "cloudflare_zone" "clo5de-info" {
   account = {
-    id = "a223ce14e88c59e7f49c01dff33c101d"
+    id = var.cf-account-id
   }
   name = "clo5de.info"
 }

@@ -1,3 +1,8 @@
+variable "cf-account-id" {
+  type = string
+  sensitive = true
+}
+
 variable "ssh_public_keys" {
   description = "SSH public keys for login Instance"
   type        = list(string)

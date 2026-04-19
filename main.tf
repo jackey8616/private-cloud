@@ -1,5 +1,6 @@
 module "DNS" {
   source = "./dns"
+  cf-account-id = var.cf-account-id 
   ip     = module.ClodeClaw.public_ipv4
 }
 module "PyFun" {
@@ -42,12 +43,14 @@ module "GroceriesNZ" {
 
 module "ClodeClaw" {
   source = "./clode-claw"
+  cf-account-id = var.cf-account-id
   ssh_public_keys = [
     linode_sshkey.MacBookAir.ssh_key
   ]
   instance_root_password = var.clode-claw-instance-default-root-password
   allowed_connection_ips = var.often-login-ips
   providers = {
+    cloudflare = cloudflare
     linode = linode
   }
 }

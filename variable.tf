@@ -2,6 +2,10 @@ variable "cf-token" {
   type      = string
   sensitive = true
 }
+variable "cf-account-id" {
+  type = string
+  sensitive = true
+}
 
 variable "linode-token" {
   type      = string
