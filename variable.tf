@@ -3,7 +3,7 @@ variable "cf-token" {
   sensitive = true
 }
 variable "cf-account-id" {
-  type = string
+  type      = string
   sensitive = true
 }
 

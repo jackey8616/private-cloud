@@ -5,8 +5,8 @@ locals {
   ]
   token_policies = [
     {
-      effect = "allow"
-      permission_groups = [ for id in local.r2_permission_ids : { id = id } ]
+      effect            = "allow"
+      permission_groups = [for id in local.r2_permission_ids : { id = id }]
       resources = jsonencode({
         "com.cloudflare.edge.r2.bucket.${var.cf-account-id}_default_${cloudflare_r2_bucket.laura-vault.name}" = "*"
       })
@@ -15,16 +15,16 @@ locals {
 }
 
 resource "cloudflare_r2_bucket" "laura-vault" {
-  account_id = var.cf-account-id
-  name = "laura-vault"
-  location = "apac"
+  account_id    = var.cf-account-id
+  name          = "laura-vault"
+  location      = "apac"
   storage_class = "Standard"
 }
 
 resource "cloudflare_account_token" "vps-token" {
   account_id = var.cf-account-id
-  name = "vps-token"
-  policies = local.token_policies
+  name       = "vps-token"
+  policies   = local.token_policies
 }
 output "vps_secret_access_key" {
   value     = sha256(cloudflare_account_token.vps-token.value)
@@ -38,8 +38,8 @@ output "vps_access_key_id" {
 
 resource "cloudflare_account_token" "rowan-mba-token" {
   account_id = var.cf-account-id
-  name = "rowan-mba-token"
-  policies = local.token_policies
+  name       = "rowan-mba-token"
+  policies   = local.token_policies
 }
 output "rowan_mba_secret_access_key" {
   value     = sha256(cloudflare_account_token.rowan-mba-token.value)
@@ -52,8 +52,8 @@ output "rowan_mba_access_key_id" {
 
 resource "cloudflare_account_token" "cld-iphone-token" {
   account_id = var.cf-account-id
-  name = "cld-iphone-token"
-  policies = local.token_policies
+  name       = "cld-iphone-token"
+  policies   = local.token_policies
 }
 output "cld_iphone_secret_access_key" {
   value     = sha256(cloudflare_account_token.cld-iphone-token.value)
