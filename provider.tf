@@ -1,6 +1,6 @@
 
 provider "cloudflare" {
-  api_token = var.cf-token
+  api_token = var.terraform-management.cf-token
 }
 
 provider "aws" {
@@ -16,5 +16,5 @@ provider "aws" {
 }
 
 provider "linode" {
-  token = var.linode-token
+  token = var.terraform-management.linode-token
 }

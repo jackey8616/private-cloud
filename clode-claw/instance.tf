@@ -16,14 +16,14 @@ resource "tls_private_key" "deploy-only" {
 }
 
 resource "linode_instance" "openclaw_server" {
-  label           = "openclaw"
-  image           = "linode/ubuntu24.04"
-  region          = linode_vpc.openclaw_sg_vpc.region
-  type            = "g6-standard-1" # Linode SharedCPU 2GB RAM
+  label  = "openclaw"
+  image  = "linode/ubuntu24.04"
+  region = linode_vpc.openclaw_sg_vpc.region
+  type   = "g6-standard-1" # Linode SharedCPU 2GB RAM
   authorized_keys = concat(var.ssh_public_keys, [
     trimspace(tls_private_key.deploy-only.public_key_openssh),
   ])
-  root_pass       = var.instance_root_password
+  root_pass = var.instance_root_password
 
   metadata {
     user_data = base64encode(templatestring(

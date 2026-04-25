@@ -1,41 +1,41 @@
 module "DNS" {
   source        = "./dns"
-  cf-account-id = var.cf-account-id
+  cf-account-id = var.terraform-management.cf-account-id
   ip            = module.ClodeClaw.public_ipv4
 }
 module "PyFun" {
   source                             = "./pyfun"
   GitHub-OIDC-Arn                    = aws_iam_openid_connect_provider.GitHub.arn
   Lambda-EdgeFunctionExecuteRole-Arn = aws_iam_policy.AWSLambdaEdgeExecutionRole.arn
-  ECR-Image-Sha                      = var.pyfun-aws-ecr-image-sha
-  Cert_Key_Path                      = var.pyfun-aws-cert-key-path
-  Cert_Pem_Path                      = var.pyfun-aws-cert-pem-path
+  ECR-Image-Sha                      = var.pyfun.aws-ecr-image-sha
+  Cert_Key_Path                      = var.pyfun.aws-cert-key-path
+  Cert_Pem_Path                      = var.pyfun.aws-cert-pem-path
 }
 
 module "Seeker" {
   source              = "./seeker"
-  gcp-project-id      = var.seeker-gcp-project-id
-  gcp-billing-account = var.seeker-gcp-billing-account
+  gcp-project-id      = var.seeker.gcp-project-id
+  gcp-billing-account = var.seeker.gcp-billing-account
 }
 
 module "FomoBot" {
   source              = "./fomo-bot"
-  gcp-project-id      = var.fomo-bot-gcp-project-id
-  gcp-billing-account = var.fomo-bot-gcp-billing-account
+  gcp-project-id      = var.fomo-bot.gcp-project-id
+  gcp-billing-account = var.fomo-bot.gcp-billing-account
 }
 
 module "Morpheus" {
   source              = "./morpheus"
-  gcp-project-id      = var.morpheus-gcp-project-id
-  gcp-billing-account = var.morpheus-gcp-billing-account
+  gcp-project-id      = var.morpheus.gcp-project-id
+  gcp-billing-account = var.morpheus.gcp-billing-account
 }
 
 module "GroceriesNZ" {
   source                             = "./groceries_nz"
   GitHub-OIDC-Arn                    = aws_iam_openid_connect_provider.GitHub.arn
   Lambda-EdgeFunctionExecuteRole-Arn = aws_iam_policy.AWSLambdaEdgeExecutionRole.arn
-  Lambda-PostgreSQL-Env              = var.groceries-nz-lambda-env-postgresql
-  ECR-Image-Sha                      = var.groceries-nz-aws-ecr-image-sha
+  Lambda-PostgreSQL-Env              = var.groceries-nz.lambda-env-postgresql
+  ECR-Image-Sha                      = var.groceries-nz.aws-ecr-image-sha
   providers = {
     aws = aws.sydney
   }
@@ -43,13 +43,13 @@ module "GroceriesNZ" {
 
 module "ClodeClaw" {
   source        = "./clode-claw"
-  cf-account-id = var.cf-account-id
+  cf-account-id = var.terraform-management.cf-account-id
   ssh_public_keys = [
     linode_sshkey.MacBookAir.ssh_key
   ]
   instance_root_password = var.clode-claw.instance-default-root-password
   instance-env           = var.clode-claw.instance-env
-  allowed_connection_ips = var.often-login-ips
+  allowed_connection_ips = var.terraform-management.often-login-ips
   providers = {
     cloudflare = cloudflare
     linode     = linode

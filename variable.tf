@@ -1,72 +1,57 @@
-variable "cf-token" {
-  type      = string
+variable "terraform-management" {
+  type = object({
+    cf-token        = string
+    cf-account-id   = string
+    linode-token    = string
+    often-login-ips = list(string)
+  })
   sensitive = true
 }
-variable "cf-account-id" {
-  type      = string
+
+
+variable "pyfun" {
+  type = object({
+    aws-ecr-image-sha = string
+    aws-cert-key-path = string
+    aws-cert-pem-path = string
+  })
   sensitive = true
 }
 
-variable "linode-token" {
-  type      = string
+
+variable "seeker" {
+  type = object({
+    gcp-project-id      = string
+    gcp-billing-account = string
+  })
   sensitive = true
 }
-variable "often-login-ips" {
-  type = list(string)
+
+
+variable "fomo-bot" {
+  type = object({
+    gcp-project-id      = string
+    gcp-billing-account = string
+  })
+  sensitive = true
 }
 
 
-variable "pyfun-aws-ecr-image-sha" {
-  type = string
-}
-variable "pyfun-aws-cert-key-path" {
-  type = string
-}
-variable "pyfun-aws-cert-pem-path" {
-  type = string
+variable "morpheus" {
+  type = object({
+    gcp-project-id      = string
+    gcp-billing-account = string
+  })
+  sensitive = true
 }
 
 
-variable "seeker-gcp-project-id" {
-  type        = string
-  description = "GCP project id for Seeker"
-}
-variable "seeker-gcp-billing-account" {
-  type        = string
-  description = "Billing Account id of GCP project Seeker"
-}
-
-
-variable "fomo-bot-gcp-project-id" {
-  type        = string
-  description = "GCP project id for FomoBot"
-}
-
-variable "fomo-bot-gcp-billing-account" {
-  type        = string
-  description = "Billing Account id of GCP project FomoBot"
-}
-
-
-variable "morpheus-gcp-project-id" {
-  type        = string
-  description = "GCP project id for Morpheus"
-}
-variable "morpheus-gcp-billing-account" {
-  type        = string
-  description = "Billing Account id of GCP project Morpheus"
-}
-
-
-variable "groceries-nz-aws-ecr-image-sha" {
-  type        = string
-  description = "Image SHA in ECR"
-}
-
-variable "groceries-nz-lambda-env-postgresql" {
-  type        = string
-  description = "PostgreSQL URI for Lambda environment variable"
-  sensitive   = true
+variable "groceries-nz" {
+  type = object({
+    aws-ecr-image-sha     = string
+    lambda-env-postgresql = string
+  })
+  sensitive = true
 }
 
 
