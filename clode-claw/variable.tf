@@ -21,6 +21,6 @@ variable "allowed_connection_ips" {
 }
 
 variable "instance-env" {
-  type = any
+  type      = any
   sensitive = true
 }
