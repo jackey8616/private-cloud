@@ -62,6 +62,7 @@ variable "clode-claw" {
       agent_user         = string
       discord_bot_token  = string
       claude_oauth_token = string
+      ollama_api_key = string
       timezone           = string
       repo_url           = string
       gh_token           = optional(string, "")

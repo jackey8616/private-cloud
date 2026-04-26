@@ -21,13 +21,6 @@ variable "allowed_connection_ips" {
 }
 
 variable "instance-env" {
-  type = object({
-    agent_user         = string
-    discord_bot_token  = string
-    claude_oauth_token = string
-    timezone           = string
-    repo_url           = string
-    gh_token           = optional(string, "")
-  })
+  type = any
   sensitive = true
 }
