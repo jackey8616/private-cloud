@@ -1,7 +1,7 @@
 module "DNS" {
   source        = "./dns"
   cf-account-id = var.terraform-management.cf-account-id
-  ip            = module.ClodeClaw.public_ipv4
+  ip            = module.ClodeClaw.clode-claw.instance.public_ipv4
 }
 module "PyFun" {
   source                             = "./pyfun"
@@ -47,7 +47,6 @@ module "ClodeClaw" {
   ssh_public_keys = [
     linode_sshkey.MacBookAir.ssh_key
   ]
-  instance_root_password = var.clode-claw.instance-default-root-password
   instance-env           = var.clode-claw.instance-env
   allowed_connection_ips = var.terraform-management.often-login-ips
   providers = {

@@ -57,7 +57,6 @@ variable "groceries-nz" {
 
 variable "clode-claw" {
   type = object({
-    instance-default-root-password = string
     instance-env = object({
       agent_user         = string
       discord_bot_token  = string

@@ -32,25 +32,9 @@ resource "cloudflare_account_token" "rowan-mba-token" {
   name       = "rowan-mba-token"
   policies   = local.token_policies
 }
-output "rowan_mba_secret_access_key" {
-  value     = sha256(cloudflare_account_token.rowan-mba-token.value)
-  sensitive = true
-}
-output "rowan_mba_access_key_id" {
-  value     = cloudflare_account_token.rowan-mba-token.id
-  sensitive = true
-}
 
 resource "cloudflare_account_token" "cld-iphone-token" {
   account_id = var.cf-account-id
   name       = "cld-iphone-token"
   policies   = local.token_policies
-}
-output "cld_iphone_secret_access_key" {
-  value     = sha256(cloudflare_account_token.cld-iphone-token.value)
-  sensitive = true
-}
-output "cld_iphone_access_key_id" {
-  value     = cloudflare_account_token.cld-iphone-token.id
-  sensitive = true
 }

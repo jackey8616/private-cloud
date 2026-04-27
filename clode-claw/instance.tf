@@ -2,6 +2,12 @@ data "http" "init_script" {
   url = "https://raw.githubusercontent.com/jackey8616/my-claw/main/templates/init.sh.tpl"
 }
 
+resource "random_password" "instance-password" {
+  length           = 40
+  special          = true
+  override_special = "_%@"
+}
+
 locals {
   data = {
     r2_account_id        = var.cf-account-id,
@@ -23,7 +29,7 @@ resource "linode_instance" "openclaw_server" {
   authorized_keys = concat(var.ssh_public_keys, [
     trimspace(tls_private_key.deploy-only.public_key_openssh),
   ])
-  root_pass = var.instance_root_password
+  root_pass = random_password.instance-password.result
 
   metadata {
     user_data = base64encode(templatestring(
