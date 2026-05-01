@@ -25,7 +25,7 @@ resource "linode_instance" "openclaw_server" {
   label  = "openclaw"
   image  = "linode/ubuntu24.04"
   region = linode_vpc.openclaw_sg_vpc.region
-  type   = "g6-standard-1" # Linode SharedCPU 2GB RAM
+  type   = "g6-nanode-1" # Linode SharedCPU 1GB RAM
   authorized_keys = concat(var.ssh_public_keys, [
     trimspace(tls_private_key.deploy-only.public_key_openssh),
   ])
