@@ -10,14 +10,24 @@ resource "linode_firewall" "openclaw_sg_fw" {
     ipv4     = var.allowed_connection_ips
   }
 
-  # inbound {
-  #   label    = "allow-ui-taiwan"
-  #   action   = "ACCEPT"
-  #   protocol = "TCP"
-  #   ports    = "80,443"
-  #   ipv4     = var.allowed_connection_ips
-  #   # ipv4 = ["0.0.0.0/0"]
-  # }
+  inbound {
+    label    = "allow-ui-taiwan"
+    action   = "ACCEPT"
+    protocol = "TCP"
+    ports    = "17031"
+    ipv4     = var.allowed_connection_ips
+    # ipv4 = ["0.0.0.0/0"]
+  }
+
+
+  inbound {
+    label    = "allow-service-taiwan"
+    action   = "ACCEPT"
+    protocol = "TCP"
+    ports    = "8642"
+    ipv4     = var.allowed_connection_ips
+    # ipv4 = ["0.0.0.0/0"]
+  }
 
   inbound {
     label    = "allow-obsidian-taiwan-TCP"
