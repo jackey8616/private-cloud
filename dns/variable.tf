@@ -6,3 +6,8 @@ variable "cf-account-id" {
 variable "ip" {
   type = string
 }
+
+variable "vpn-ip" {
+  type = string
+  sensitive = true
+}

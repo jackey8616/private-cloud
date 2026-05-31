@@ -10,3 +10,8 @@ output "clode-claw" {
   value     = module.ClodeClaw.clode-claw
   sensitive = true
 }
+
+output "clode-tools" {
+  value     = module.Clode-Tools.clode-tools
+  sensitive = true
+}

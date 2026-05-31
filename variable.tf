@@ -8,6 +8,18 @@ variable "terraform-management" {
   sensitive = true
 }
 
+variable "clode-tools" {
+  type = object({
+    gcp-project-id = string
+    gcp-billing-account = string
+    vpn-username = string
+    vpn-password = string
+    vpn-psk = string
+    use-spot = bool
+  })
+  sensitive = true
+}
+
 
 variable "pyfun" {
   type = object({
@@ -62,6 +74,7 @@ variable "clode-claw" {
       discord_bot_token  = string
       claude_oauth_token = string
       ollama_api_key     = string
+      hermes_image       = string
       timezone           = string
       repo_url           = string
       gh_token           = optional(string, "")

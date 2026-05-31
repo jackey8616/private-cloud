@@ -2,7 +2,19 @@ module "DNS" {
   source        = "./dns"
   cf-account-id = var.terraform-management.cf-account-id
   ip            = module.ClodeClaw.clode-claw.instance.public_ipv4
+  vpn-ip = module.Clode-Tools.clode-tools.vpn.ip
 }
+
+module "Clode-Tools" {
+  source = "./clode-tools"
+  gcp-project-id = var.clode-tools.gcp-project-id
+  gcp-billing-account = var.clode-tools.gcp-billing-account
+  vpn-username = var.clode-tools.vpn-username
+  vpn-password = var.clode-tools.vpn-password
+  vpn-psk = var.clode-tools.vpn-psk
+  use-spot = var.clode-tools.use-spot
+}
+
 module "PyFun" {
   source                             = "./pyfun"
   GitHub-OIDC-Arn                    = aws_iam_openid_connect_provider.GitHub.arn
