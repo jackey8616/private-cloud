@@ -22,3 +22,25 @@ variable "region" {
   type    = string
   default = "asia-northeast1"
 }
+
+variable "allow-origins" {
+  type        = string
+  description = "JSON-encoded array of allowed CORS origins for the backend."
+  default     = "[\"https://silverfish.cc\"]"
+}
+
+variable "crawl-duration" {
+  type        = number
+  description = "Minutes between content re-crawls."
+  default     = 60
+}
+
+variable "github-oidc-pool-name" {
+  type        = string
+  description = "Full resource name of the shared GitHub WIF pool (from module.GitHubOIDC.pool-name)"
+}
+
+variable "github-org-name" {
+  type        = string
+  description = "GitHub organization or user that owns Silverfish-Backend"
+}

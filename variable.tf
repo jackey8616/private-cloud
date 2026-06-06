@@ -7,6 +7,7 @@ variable "terraform-management" {
     mongodbatlas-public-key  = string
     mongodbatlas-private-key = string
     mongodbatlas-org-id      = string
+    github-token             = string
   })
   sensitive = true
 }

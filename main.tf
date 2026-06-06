@@ -1,3 +1,39 @@
+locals {
+  github-org-name = "jackey8616"
+}
+
+module "GitHubOIDC" {
+  source                = "./github-oidc"
+  manage-gcp-project-id = var.silverfish.gcp-project-id
+  github-org-name       = local.github-org-name
+}
+
+module "GitHub" {
+  source          = "./github"
+  github-org-name = local.github-org-name
+  github-token    = var.terraform-management.github-token
+  repository-variables = {
+    "Silverfish-Backend" = {
+      GCP_PROJECT_ID                 = module.Silverfish.silverfish.backend.project_id
+      GCP_REGION                     = module.Silverfish.silverfish.backend.region
+      GCP_AR_REPOSITORY              = "silverfish-backend"
+      GCP_CLOUD_RUN_SERVICE          = "silverfish-backend"
+      GCP_WORKLOAD_IDENTITY_PROVIDER = module.GitHubOIDC.provider-name
+      GCP_DEPLOY_SERVICE_ACCOUNT     = module.Silverfish.silverfish.oidc.gha_sa_email
+    }
+  }
+}
+
+import {
+  to = module.GitHub.github_repository.silverfish-backend
+  id = "Silverfish-Backend"
+}
+
+import {
+  to = module.GitHub.github_repository.silverfish-vue
+  id = "Silverfish-Vue"
+}
+
 module "DNS" {
   source        = "./dns"
   cf-account-id = var.terraform-management.cf-account-id
@@ -68,11 +104,13 @@ module "ClodeClaw" {
 }
 
 module "Silverfish" {
-  source              = "./silverfish"
-  atlas-org-id        = var.terraform-management.mongodbatlas-org-id
-  allow-ips           = var.terraform-management.often-login-ips
-  gcp-project-id      = var.silverfish.gcp-project-id
-  gcp-billing-account = var.silverfish.gcp-billing-account
+  source                = "./silverfish"
+  atlas-org-id          = var.terraform-management.mongodbatlas-org-id
+  allow-ips             = var.terraform-management.often-login-ips
+  gcp-project-id        = var.silverfish.gcp-project-id
+  gcp-billing-account   = var.silverfish.gcp-billing-account
+  github-oidc-pool-name = module.GitHubOIDC.pool-name
+  github-org-name       = local.github-org-name
 }
 
 import {

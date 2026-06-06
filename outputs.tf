@@ -17,6 +17,16 @@ output "clode-tools" {
 }
 
 output "silverfish" {
-  value     = module.Silverfish.silverfish
+  value = merge(
+    module.Silverfish.silverfish,
+    {
+      oidc = merge(
+        module.Silverfish.silverfish.oidc,
+        {
+          workload_identity_provider = module.GitHubOIDC.provider-name
+        }
+      )
+    }
+  )
   sensitive = true
 }
