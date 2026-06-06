@@ -1,3 +1,9 @@
+resource "google_project" "silverfish" {
+  name            = "Silverfish"
+  project_id      = var.gcp-project-id
+  billing_account = var.gcp-billing-account
+}
+
 resource "mongodbatlas_project" "silverfish" {
   name   = "Silverfish"
   org_id = var.atlas-org-id

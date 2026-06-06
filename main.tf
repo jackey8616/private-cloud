@@ -68,10 +68,17 @@ module "ClodeClaw" {
 }
 
 module "Silverfish" {
-  source       = "./silverfish"
-  atlas-org-id = var.terraform-management.mongodbatlas-org-id
-  db-password  = var.silverfish.db-password
-  allow-ips    = var.terraform-management.often-login-ips
+  source              = "./silverfish"
+  atlas-org-id        = var.terraform-management.mongodbatlas-org-id
+  db-password         = var.silverfish.db-password
+  allow-ips           = var.terraform-management.often-login-ips
+  gcp-project-id      = var.silverfish.gcp-project-id
+  gcp-billing-account = var.silverfish.gcp-billing-account
+}
+
+import {
+  to = module.Silverfish.google_project.silverfish
+  id = var.silverfish.gcp-project-id
 }
 
 resource "aws_servicecatalogappregistry_application" "terraform" {
