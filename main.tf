@@ -104,9 +104,12 @@ module "ClodeClaw" {
 }
 
 module "Silverfish" {
-  source                = "./silverfish"
-  atlas-org-id          = var.terraform-management.mongodbatlas-org-id
-  allow-ips             = var.terraform-management.often-login-ips
+  source       = "./silverfish"
+  atlas-org-id = var.terraform-management.mongodbatlas-org-id
+  # Atlas M0 doesn't support GCP private endpoints, and Cloud Run egress IPs
+  # are dynamic. Open the IP allowlist; the database user password (managed in
+  # Secret Manager) is the actual access control.
+  allow-ips             = concat(var.terraform-management.often-login-ips, ["0.0.0.0/0"])
   gcp-project-id        = var.silverfish.gcp-project-id
   gcp-billing-account   = var.silverfish.gcp-billing-account
   github-oidc-pool-name = module.GitHubOIDC.pool-name
