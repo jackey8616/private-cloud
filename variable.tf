@@ -72,7 +72,6 @@ variable "groceries-nz" {
 
 variable "silverfish" {
   type = object({
-    db-password         = string
     gcp-project-id      = string
     gcp-billing-account = string
   })

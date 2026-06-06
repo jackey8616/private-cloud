@@ -31,7 +31,7 @@ resource "mongodbatlas_advanced_cluster" "silverfish" {
 resource "mongodbatlas_database_user" "silverfish" {
   project_id         = mongodbatlas_project.silverfish.id
   username           = "silverfish"
-  password           = var.db-password
+  password           = data.google_secret_manager_secret_version.db-password.secret_data
   auth_database_name = "admin"
 
   roles {
