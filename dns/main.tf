@@ -54,7 +54,13 @@ resource "cloudflare_dns_record" "silverfish-cc-api" {
   name    = "api.silverfish.cc"
   content = var.silverfish-backend-hostname
   type    = "CNAME"
-  proxied = true
+
+  # DNS only (gray cloud), not proxied. Cloud Run uses a Google-managed cert
+  # whose issuance requires Google's ACME validator to reach api.silverfish.cc
+  # directly; with CF proxy on, the validator hits CF instead of GHS and the
+  # cert is never provisioned. With gray cloud, the browser TLS terminates at
+  # Cloud Run itself and Google's cert is valid for api.silverfish.cc.
+  proxied = false
   ttl     = 1
 }
 

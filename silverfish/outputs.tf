@@ -13,6 +13,7 @@ output "silverfish" {
       artifact_registry_url = "${var.region}-docker.pkg.dev/${google_project.silverfish.project_id}/${google_artifact_registry_repository.silverfish.repository_id}"
       runtime_sa            = google_service_account.cloud-run.email
       service_url           = google_cloud_run_v2_service.silverfish.uri
+      api_cname_target      = try(google_cloud_run_domain_mapping.silverfish-api.status[0].resource_records[0].rrdata, "")
       populate_secrets = [
         "echo -n '<DB_PASSWORD value>'   | gcloud secrets versions add DB_PASSWORD   --project=${google_project.silverfish.project_id} --data-file=-",
         "echo -n '<RECAPTCHA_KEY value>' | gcloud secrets versions add RECAPTCHA_KEY --project=${google_project.silverfish.project_id} --data-file=-",

@@ -121,6 +121,30 @@ resource "google_cloud_run_v2_service" "silverfish" {
   depends_on = [google_secret_manager_secret_iam_member.cloud-run-can-read]
 }
 
+# Custom domain mapping so Cloud Run accepts requests with Host: api.silverfish.cc.
+# Without this, a CF-proxied CNAME from api.silverfish.cc to *.run.app returns
+# 404 because Cloud Run multi-tenancy uses the Host header to route between
+# services. After apply, the mapping exposes a status.resource_records[0]
+# rrdata (typically ghs.googlehosted.com) that the dns/ module uses as the
+# CNAME target on Cloudflare.
+#
+# REQUIRES: silverfish.cc must be verified for the GCP account running TF in
+# Google Search Console. The zone already has a google-site-verification TXT;
+# if it's not for the right account, this resource will fail with
+# DOMAIN_OWNERSHIP_REQUIRED — verify at https://search.google.com/search-console.
+resource "google_cloud_run_domain_mapping" "silverfish-api" {
+  name     = "api.silverfish.cc"
+  location = var.region
+
+  metadata {
+    namespace = google_project.silverfish.project_id
+  }
+
+  spec {
+    route_name = google_cloud_run_v2_service.silverfish.name
+  }
+}
+
 # Public — the API is intended to be hit by browsers.
 resource "google_cloud_run_v2_service_iam_member" "public-invoker" {
   project  = google_cloud_run_v2_service.silverfish.project
