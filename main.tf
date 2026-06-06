@@ -2,17 +2,17 @@ module "DNS" {
   source        = "./dns"
   cf-account-id = var.terraform-management.cf-account-id
   ip            = module.ClodeClaw.clode-claw.instance.public_ipv4
-  vpn-ip = module.Clode-Tools.clode-tools.vpn.ip
+  vpn-ip        = module.Clode-Tools.clode-tools.vpn.ip
 }
 
 module "Clode-Tools" {
-  source = "./clode-tools"
-  gcp-project-id = var.clode-tools.gcp-project-id
+  source              = "./clode-tools"
+  gcp-project-id      = var.clode-tools.gcp-project-id
   gcp-billing-account = var.clode-tools.gcp-billing-account
-  vpn-username = var.clode-tools.vpn-username
-  vpn-password = var.clode-tools.vpn-password
-  vpn-psk = var.clode-tools.vpn-psk
-  use-spot = var.clode-tools.use-spot
+  vpn-username        = var.clode-tools.vpn-username
+  vpn-password        = var.clode-tools.vpn-password
+  vpn-psk             = var.clode-tools.vpn-psk
+  use-spot            = var.clode-tools.use-spot
 }
 
 module "PyFun" {
@@ -65,6 +65,13 @@ module "ClodeClaw" {
     cloudflare = cloudflare
     linode     = linode
   }
+}
+
+module "Silverfish" {
+  source       = "./silverfish"
+  atlas-org-id = var.terraform-management.mongodbatlas-org-id
+  db-password  = var.silverfish.db-password
+  allow-ips    = var.terraform-management.often-login-ips
 }
 
 resource "aws_servicecatalogappregistry_application" "terraform" {

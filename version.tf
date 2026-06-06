@@ -14,6 +14,11 @@ terraform {
       source  = "linode/linode"
       version = "3.10.0"
     }
+
+    mongodbatlas = {
+      source  = "mongodb/mongodbatlas"
+      version = "~> 1.18"
+    }
   }
 
   backend "s3" {

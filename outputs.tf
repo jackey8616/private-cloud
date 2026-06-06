@@ -15,3 +15,8 @@ output "clode-tools" {
   value     = module.Clode-Tools.clode-tools
   sensitive = true
 }
+
+output "silverfish" {
+  value     = module.Silverfish.silverfish
+  sensitive = true
+}

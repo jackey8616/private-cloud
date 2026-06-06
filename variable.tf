@@ -1,21 +1,24 @@
 variable "terraform-management" {
   type = object({
-    cf-token        = string
-    cf-account-id   = string
-    linode-token    = string
-    often-login-ips = list(string)
+    cf-token                 = string
+    cf-account-id            = string
+    linode-token             = string
+    often-login-ips          = list(string)
+    mongodbatlas-public-key  = string
+    mongodbatlas-private-key = string
+    mongodbatlas-org-id      = string
   })
   sensitive = true
 }
 
 variable "clode-tools" {
   type = object({
-    gcp-project-id = string
+    gcp-project-id      = string
     gcp-billing-account = string
-    vpn-username = string
-    vpn-password = string
-    vpn-psk = string
-    use-spot = bool
+    vpn-username        = string
+    vpn-password        = string
+    vpn-psk             = string
+    use-spot            = bool
   })
   sensitive = true
 }
@@ -62,6 +65,14 @@ variable "groceries-nz" {
   type = object({
     aws-ecr-image-sha     = string
     lambda-env-postgresql = string
+  })
+  sensitive = true
+}
+
+
+variable "silverfish" {
+  type = object({
+    db-password = string
   })
   sensitive = true
 }
