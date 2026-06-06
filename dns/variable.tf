@@ -8,6 +8,6 @@ variable "ip" {
 }
 
 variable "vpn-ip" {
-  type = string
+  type      = string
   sensitive = true
 }

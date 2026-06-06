@@ -1,10 +1,10 @@
 variable "gcp-project-id" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "gcp-billing-account" {
-  type = string  
+  type      = string
   sensitive = true
 }
 
@@ -29,16 +29,16 @@ variable "use-spot" {
 }
 
 variable "vpn-username" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "vpn-password" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "vpn-psk" {
-  type = string
+  type      = string
   sensitive = true
 }

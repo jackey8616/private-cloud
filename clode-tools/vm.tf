@@ -26,7 +26,7 @@ resource "google_compute_instance" "ipsec" {
           name  = "l2tp-ipsec-vpn"
           image = "hwdsl2/ipsec-vpn-server"
           env = [
-            { name = "VPN_USER",     value = var.vpn-username },
+            { name = "VPN_USER", value = var.vpn-username },
             { name = "VPN_PASSWORD", value = var.vpn-password },
             { name = "VPN_IPSEC_PSK", value = var.vpn-psk },
           ]
@@ -40,7 +40,7 @@ resource "google_compute_instance" "ipsec" {
           }]
         }]
         volumes = [{
-          name = "lib-modules"
+          name     = "lib-modules"
           hostPath = { path = "/lib/modules" }
         }]
         restartPolicy = "Always"

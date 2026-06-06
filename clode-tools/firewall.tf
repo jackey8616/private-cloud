@@ -5,7 +5,7 @@ resource "google_compute_firewall" "ipsec" {
   allow {
     protocol = "udp"
     # ✅ 加入 1701 (L2TP)
-    ports    = ["500", "1701", "4500"]
+    ports = ["500", "1701", "4500"]
   }
 
   allow {
