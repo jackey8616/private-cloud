@@ -24,16 +24,6 @@ module "GitHub" {
   }
 }
 
-import {
-  to = module.GitHub.github_repository.silverfish-backend
-  id = "Silverfish-Backend"
-}
-
-import {
-  to = module.GitHub.github_repository.silverfish-vue
-  id = "Silverfish-Vue"
-}
-
 module "DNS" {
   source        = "./dns"
   cf-account-id = var.terraform-management.cf-account-id
@@ -114,11 +104,6 @@ module "Silverfish" {
   gcp-billing-account   = var.silverfish.gcp-billing-account
   github-oidc-pool-name = module.GitHubOIDC.pool-name
   github-org-name       = local.github-org-name
-}
-
-import {
-  to = module.Silverfish.google_project.silverfish
-  id = var.silverfish.gcp-project-id
 }
 
 resource "aws_servicecatalogappregistry_application" "terraform" {
