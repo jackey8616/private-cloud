@@ -25,10 +25,11 @@ module "GitHub" {
 }
 
 module "DNS" {
-  source        = "./dns"
-  cf-account-id = var.terraform-management.cf-account-id
-  ip            = module.ClodeClaw.clode-claw.instance.public_ipv4
-  vpn-ip        = module.Clode-Tools.clode-tools.vpn.ip
+  source                      = "./dns"
+  cf-account-id               = var.terraform-management.cf-account-id
+  ip                          = module.ClodeClaw.clode-claw.instance.public_ipv4
+  vpn-ip                      = module.Clode-Tools.clode-tools.vpn.ip
+  silverfish-backend-hostname = trimprefix(module.Silverfish.silverfish.backend.service_url, "https://")
 }
 
 module "Clode-Tools" {

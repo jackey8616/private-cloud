@@ -49,6 +49,15 @@ resource "cloudflare_dns_record" "silverfish-cc-apex" {
   ttl     = 1
 }
 
+resource "cloudflare_dns_record" "silverfish-cc-api" {
+  zone_id = cloudflare_zone.silverfish-cc.id
+  name    = "api.silverfish.cc"
+  content = var.silverfish-backend-hostname
+  type    = "CNAME"
+  proxied = true
+  ttl     = 1
+}
+
 resource "cloudflare_dns_record" "silverfish-cc-www" {
   zone_id = cloudflare_zone.silverfish-cc.id
   name    = "www.silverfish.cc"
