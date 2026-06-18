@@ -23,6 +23,15 @@ resource "cloudflare_dns_record" "vpn" {
   ttl     = 60
 }
 
+resource "cloudflare_dns_record" "knight-strike" {
+  zone_id = cloudflare_zone.clo5de-info.id
+  name    = "knight-strike"
+  content = "jackey8616.github.io"
+  type    = "CNAME"
+  proxied = true
+  ttl     = 1
+}
+
 
 # silverfish.cc — managed in this module since dns/ already owns Cloudflare
 # zones. Apex points at GitHub Pages (4 IPs); www / blog / morpheus / webmail

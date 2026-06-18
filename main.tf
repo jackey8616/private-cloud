@@ -9,9 +9,10 @@ module "GitHubOIDC" {
 }
 
 module "GitHub" {
-  source          = "./github"
-  github-org-name = local.github-org-name
-  github-token    = var.terraform-management.github-token
+  source                    = "./github"
+  github-org-name           = local.github-org-name
+  github-token              = var.terraform-management.github-token
+  knight-strike-pages-cname = module.DNS.knight-strike-pages-fqdn
   repository-variables = {
     "Silverfish-Backend" = {
       GCP_PROJECT_ID                 = module.Silverfish.silverfish.backend.project_id
