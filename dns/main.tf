@@ -23,6 +23,15 @@ resource "cloudflare_dns_record" "vpn" {
   ttl     = 60
 }
 
+resource "cloudflare_dns_record" "vpn-jp" {
+  zone_id = cloudflare_zone.clo5de-info.id
+  name    = "vpn-jp"
+  content = var.vpn-jp-ip
+  type    = "A"
+  proxied = false
+  ttl     = 60
+}
+
 resource "cloudflare_dns_record" "knight-strike" {
   zone_id = cloudflare_zone.clo5de-info.id
   name    = "knight-strike"

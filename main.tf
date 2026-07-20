@@ -30,6 +30,7 @@ module "DNS" {
   cf-account-id               = var.terraform-management.cf-account-id
   ip                          = module.ClodeClaw.clode-claw.instance.public_ipv4
   vpn-ip                      = module.Clode-Tools.clode-tools.vpn.ip
+  vpn-jp-ip                   = module.Clode-Tools.clode-tools.vpn-jp.ip
   silverfish-backend-hostname = module.Silverfish.silverfish.backend.api_cname_target
 }
 

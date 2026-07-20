@@ -18,6 +18,16 @@ variable "zone" {
   default = "asia-east1-b"
 }
 
+variable "region-jp" {
+  type    = string
+  default = "asia-northeast1"
+}
+
+variable "zone-jp" {
+  type    = string
+  default = "asia-northeast1-a"
+}
+
 variable "machine_type" {
   type    = string
   default = "e2-micro"
