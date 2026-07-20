@@ -39,8 +39,7 @@ All sensitive configuration lives in AWS Secrets Manager (region `ap-northeast-1
 There are 13 secrets: the former `terraform-management` catch-all is split by provider (`cloudflare`, `linode`, `mongodbatlas`, `github`) plus a shared `common` (holds `often-login-ips`), and one per app module (`clode-tools`, `pyfun`, `seeker`, `fomo-bot`, `morpheus`, `groceries-nz`, `silverfish`, `clode-claw`).
 
 - Terraform only *reads* these; the plaintext never comes from a Terraform input, so there is no local tfvars file.
-- Edit one value: `scripts/secrets-edit.sh <name>` (fetch → `$EDITOR` → push a new version).
-- Bulk-seed from a `terraform.tfvars.json` (first-time migration or disaster recovery): `scripts/secrets-push.sh`.
+- Edit one value: `scripts/secrets-edit.sh <name>` (fetch → `$EDITOR` → push a new version). (The one-time bulk migration script has been removed now that the migration is done — see git history if you ever need to re-seed from a tfvars.json.)
 - Caveat: read values are copied into the S3 state. The state's encryption + access control is the real security boundary — not the absence of a local file.
 
 ### PyFun TLS certificate
