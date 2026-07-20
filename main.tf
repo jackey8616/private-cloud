@@ -49,8 +49,7 @@ module "PyFun" {
   GitHub-OIDC-Arn                    = aws_iam_openid_connect_provider.GitHub.arn
   Lambda-EdgeFunctionExecuteRole-Arn = aws_iam_policy.AWSLambdaEdgeExecutionRole.arn
   ECR-Image-Sha                      = local.pyfun["aws-ecr-image-sha"]
-  Cert_Key_Path                      = local.pyfun["aws-cert-key-path"]
-  Cert_Pem_Path                      = local.pyfun["aws-cert-pem-path"]
+  Cert_Arn                           = aws_acm_certificate_validation.pyfun_backend_v2.certificate_arn
 }
 
 module "Seeker" {

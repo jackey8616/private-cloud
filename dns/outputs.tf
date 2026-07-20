@@ -7,3 +7,8 @@ output "knight-strike-pages-fqdn" {
   description = "FQDN of the knight-strike GitHub Pages CNAME, for the GitHub module's Pages custom domain."
   value       = cloudflare_dns_record.knight-strike.name
 }
+
+output "clo5de-info-zone-id" {
+  description = "Zone ID of the clo5de.info Cloudflare zone, for records managed outside this module (e.g. the root-level ACM DNS-validation record for PyFun)."
+  value       = cloudflare_zone.clo5de-info.id
+}

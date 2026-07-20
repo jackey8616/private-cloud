@@ -181,7 +181,7 @@ resource "aws_api_gateway_stage" "v2_stage" {
 
 resource "aws_api_gateway_domain_name" "pyfun-backend-v2_clo5de_info" {
   domain_name              = "pyfun-backend-v2.clo5de.info"
-  regional_certificate_arn = aws_acm_certificate.pyfun-backend-v2_clo5de_info.arn
+  regional_certificate_arn = var.Cert_Arn
 
   tags = merge(aws_servicecatalogappregistry_application.pyfun.application_tag)
 

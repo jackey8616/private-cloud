@@ -10,10 +10,6 @@ variable "ECR-Image-Sha" {
   type = string
 }
 
-variable "Cert_Key_Path" {
-  type = string
-}
-
-variable "Cert_Pem_Path" {
+variable "Cert_Arn" {
   type = string
 }
