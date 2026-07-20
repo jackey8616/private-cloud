@@ -4,14 +4,14 @@ locals {
 
 module "GitHubOIDC" {
   source                = "./github-oidc"
-  manage-gcp-project-id = var.silverfish.gcp-project-id
+  manage-gcp-project-id = local.silverfish["gcp-project-id"]
   github-org-name       = local.github-org-name
 }
 
 module "GitHub" {
   source                    = "./github"
   github-org-name           = local.github-org-name
-  github-token              = var.terraform-management.github-token
+  github-token              = local.github["token"]
   knight-strike-pages-cname = module.DNS.knight-strike-pages-fqdn
   repository-variables = {
     "Silverfish-Backend" = {
@@ -27,7 +27,7 @@ module "GitHub" {
 
 module "DNS" {
   source                      = "./dns"
-  cf-account-id               = var.terraform-management.cf-account-id
+  cf-account-id               = local.cloudflare["account-id"]
   ip                          = module.ClodeClaw.clode-claw.instance.public_ipv4
   vpn-ip                      = module.Clode-Tools.clode-tools.vpn.ip
   vpn-jp-ip                   = module.Clode-Tools.clode-tools.vpn-jp.ip
@@ -36,47 +36,47 @@ module "DNS" {
 
 module "Clode-Tools" {
   source              = "./clode-tools"
-  gcp-project-id      = var.clode-tools.gcp-project-id
-  gcp-billing-account = var.clode-tools.gcp-billing-account
-  vpn-username        = var.clode-tools.vpn-username
-  vpn-password        = var.clode-tools.vpn-password
-  vpn-psk             = var.clode-tools.vpn-psk
-  use-spot            = var.clode-tools.use-spot
+  gcp-project-id      = local.clode_tools["gcp-project-id"]
+  gcp-billing-account = local.clode_tools["gcp-billing-account"]
+  vpn-username        = local.clode_tools["vpn-username"]
+  vpn-password        = local.clode_tools["vpn-password"]
+  vpn-psk             = local.clode_tools["vpn-psk"]
+  use-spot            = local.clode_tools["use-spot"]
 }
 
 module "PyFun" {
   source                             = "./pyfun"
   GitHub-OIDC-Arn                    = aws_iam_openid_connect_provider.GitHub.arn
   Lambda-EdgeFunctionExecuteRole-Arn = aws_iam_policy.AWSLambdaEdgeExecutionRole.arn
-  ECR-Image-Sha                      = var.pyfun.aws-ecr-image-sha
-  Cert_Key_Path                      = var.pyfun.aws-cert-key-path
-  Cert_Pem_Path                      = var.pyfun.aws-cert-pem-path
+  ECR-Image-Sha                      = local.pyfun["aws-ecr-image-sha"]
+  Cert_Key_Path                      = local.pyfun["aws-cert-key-path"]
+  Cert_Pem_Path                      = local.pyfun["aws-cert-pem-path"]
 }
 
 module "Seeker" {
   source              = "./seeker"
-  gcp-project-id      = var.seeker.gcp-project-id
-  gcp-billing-account = var.seeker.gcp-billing-account
+  gcp-project-id      = local.seeker["gcp-project-id"]
+  gcp-billing-account = local.seeker["gcp-billing-account"]
 }
 
 module "FomoBot" {
   source              = "./fomo-bot"
-  gcp-project-id      = var.fomo-bot.gcp-project-id
-  gcp-billing-account = var.fomo-bot.gcp-billing-account
+  gcp-project-id      = local.fomo_bot["gcp-project-id"]
+  gcp-billing-account = local.fomo_bot["gcp-billing-account"]
 }
 
 module "Morpheus" {
   source              = "./morpheus"
-  gcp-project-id      = var.morpheus.gcp-project-id
-  gcp-billing-account = var.morpheus.gcp-billing-account
+  gcp-project-id      = local.morpheus["gcp-project-id"]
+  gcp-billing-account = local.morpheus["gcp-billing-account"]
 }
 
 module "GroceriesNZ" {
   source                             = "./groceries_nz"
   GitHub-OIDC-Arn                    = aws_iam_openid_connect_provider.GitHub.arn
   Lambda-EdgeFunctionExecuteRole-Arn = aws_iam_policy.AWSLambdaEdgeExecutionRole.arn
-  Lambda-PostgreSQL-Env              = var.groceries-nz.lambda-env-postgresql
-  ECR-Image-Sha                      = var.groceries-nz.aws-ecr-image-sha
+  Lambda-PostgreSQL-Env              = local.groceries_nz["lambda-env-postgresql"]
+  ECR-Image-Sha                      = local.groceries_nz["aws-ecr-image-sha"]
   providers = {
     aws = aws.sydney
   }
@@ -84,12 +84,12 @@ module "GroceriesNZ" {
 
 module "ClodeClaw" {
   source        = "./clode-claw"
-  cf-account-id = var.terraform-management.cf-account-id
+  cf-account-id = local.cloudflare["account-id"]
   ssh_public_keys = [
     linode_sshkey.MacBookAir.ssh_key
   ]
-  instance-env           = var.clode-claw.instance-env
-  allowed_connection_ips = var.terraform-management.often-login-ips
+  instance-env           = local.clode_claw["instance-env"]
+  allowed_connection_ips = local.common["often-login-ips"]
   providers = {
     cloudflare = cloudflare
     linode     = linode
@@ -98,13 +98,13 @@ module "ClodeClaw" {
 
 module "Silverfish" {
   source       = "./silverfish"
-  atlas-org-id = var.terraform-management.mongodbatlas-org-id
+  atlas-org-id = local.mongodbatlas["org-id"]
   # Atlas M0 doesn't support GCP private endpoints, and Cloud Run egress IPs
   # are dynamic. Open the IP allowlist; the database user password (managed in
   # Secret Manager) is the actual access control.
-  allow-ips             = concat(var.terraform-management.often-login-ips, ["0.0.0.0/0"])
-  gcp-project-id        = var.silverfish.gcp-project-id
-  gcp-billing-account   = var.silverfish.gcp-billing-account
+  allow-ips             = concat(local.common["often-login-ips"], ["0.0.0.0/0"])
+  gcp-project-id        = local.silverfish["gcp-project-id"]
+  gcp-billing-account   = local.silverfish["gcp-billing-account"]
   github-oidc-pool-name = module.GitHubOIDC.pool-name
   github-org-name       = local.github-org-name
 }
