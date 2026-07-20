@@ -27,9 +27,20 @@ Single-module work: you can also `cd <module>/ && terraform ...` only for `valid
 ## Required local files (gitignored, must exist before `init`/`plan`)
 
 - `.aws_credentials` — AWS shared-credentials file. Referenced by *both* the AWS provider (`provider.tf`) and the S3 backend (`version.tf`). Default profile is used.
-- `terraform.tfvars.json` — every sensitive variable for every module. The root `variable.tf` declares one typed object per module (`terraform-management`, `clode-tools`, `pyfun`, `seeker`, `fomo-bot`, `morpheus`, `groceries-nz`, `clode-claw`); the JSON file must populate all of them or `terraform plan` fails. Both files are in `.gitignore` — never commit them.
+- Sensitive variables are **not** stored locally — they live in AWS Secrets Manager (one secret per module; see the "Secrets" section below). There is no `terraform.tfvars.json` anymore. `.aws_credentials` remains gitignored — never commit it.
 - `~/.ssh/github.pub` — read by `credentials.tf` and injected as the MacBook Air SSH key into Linode.
-- `pyfun/certs/pyfun-backend-v2.clo5de.info.{key,pem}` — TLS cert/key for the PyFun API Gateway custom domain, paths come from `var.pyfun`.
+- `pyfun/certs/pyfun-backend-v2.clo5de.info.{key,pem}` — TLS cert/key for the PyFun API Gateway custom domain; the paths come from the `pyfun` secret's `aws-cert-key-path` / `aws-cert-pem-path`. (Still a local secret — the cert/key content is not yet migrated into Secrets Manager.)
+
+## Secrets (AWS Secrets Manager)
+
+All sensitive configuration lives in AWS Secrets Manager (region `ap-northeast-1`, same account/creds as the S3 backend), one secret per `private-cloud/<name>`, read by the `data "aws_secretsmanager_secret_version"` blocks in `secrets.tf` and exposed as `local.<name>`. References use bracket indexing (`local.clode_tools["gcp-project-id"]`) because `jsondecode` keeps the hyphenated keys.
+
+There are 13 secrets: the former `terraform-management` catch-all is split by provider (`cloudflare`, `linode`, `mongodbatlas`, `github`) plus a shared `common` (holds `often-login-ips`), and one per app module (`clode-tools`, `pyfun`, `seeker`, `fomo-bot`, `morpheus`, `groceries-nz`, `silverfish`, `clode-claw`).
+
+- Terraform only *reads* these; the plaintext never comes from a Terraform input, so there is no local tfvars file.
+- Edit one value: `scripts/secrets-edit.sh <name>` (fetch → `$EDITOR` → push a new version).
+- Bulk-seed from a `terraform.tfvars.json` (first-time migration or disaster recovery): `scripts/secrets-push.sh`.
+- Caveat: read values are copied into the S3 state. The state's encryption + access control is the real security boundary — not the absence of a local file.
 
 ## Architecture: how the modules fit together
 
@@ -44,16 +55,16 @@ Root-level shared resources that downstream modules depend on:
 - `aws_servicecatalogappregistry_application.terraform` — its `application_tag` is `merge`d into every taggable resource for cost/grouping. Each app module also declares its own appregistry application and tags its resources with that.
 
 Module wiring summary (read `main.tf` first for any change):
-- `Clode-Tools` (GCP) → exposes `vpn.ip`, consumed by `DNS`. Runs `hwdsl2/ipsec-vpn-server` on a COS GCE instance; `use-spot` toggle in tfvars switches preemptible vs standard.
+- `Clode-Tools` (GCP) → exposes `vpn.ip`, consumed by `DNS`. Runs `hwdsl2/ipsec-vpn-server` on a COS GCE instance; the `use-spot` toggle in the `clode-tools` secret switches preemptible vs standard.
 - `ClodeClaw` (Linode + Cloudflare R2) → exposes `instance.public_ipv4`, consumed by `DNS`. The instance is bootstrapped by fetching `templates/init.sh.tpl` from `jackey8616/my-claw` at apply time and rendering it with `var.instance-env` + R2 credentials it generates. The `remote-exec` provisioner waits for cloud-init and greps for `Setup complete!` — if the upstream template changes that sentinel, applies will hang then fail. SSH uses an ephemeral `tls_private_key` for the provisioner; humans log in with the keys in `ssh_public_keys`.
 - `DNS` (Cloudflare) → manages the `clo5de.info` zone and writes A records pointing at the two IPs above.
-- `PyFun`, `GroceriesNZ` (AWS) → Lambda-on-container apps. Images come from ECR; image SHAs are pinned via `var.pyfun.aws-ecr-image-sha` / `var.groceries-nz.aws-ecr-image-sha` and must be bumped manually when a new image is pushed. GroceriesNZ is a 6-level Step Function pipeline (`L1_store_dispatcher` → `L6_item_copier` + `view_updater`), scheduled daily at 18:00 UTC by EventBridge.
+- `PyFun`, `GroceriesNZ` (AWS) → Lambda-on-container apps. Images come from ECR; image SHAs are pinned via the `aws-ecr-image-sha` key in the `pyfun` / `groceries-nz` secrets and must be bumped manually (`scripts/secrets-edit.sh pyfun`) when a new image is pushed. GroceriesNZ is a 6-level Step Function pipeline (`L1_store_dispatcher` → `L6_item_copier` + `view_updater`), scheduled daily at 18:00 UTC by EventBridge.
 - `Morpheus`, `Seeker`, `FomoBot` (GCP) → each creates its own GCP project + billing link + service accounts. Morpheus and Seeker define a `vertex_ai_predictor` custom role that grants only `aiplatform.endpoints.predict`.
 
 ## Conventions and gotchas
 
 - Linode instance type for `clode-claw` is intentionally `g6-nanode-1` (smallest); see `doc/LinodeInstanceType.md` for the full label↔ID map before changing.
-- `clode-claw/firewall.tf` restricts inbound to `var.terraform-management.often-login-ips`. Adding a new home/office IP is done by editing the `often-login-ips` list in `terraform.tfvars.json`.
+- `clode-claw/firewall.tf` restricts inbound to the `often-login-ips` list (now in the `common` secret). Add a new home/office IP with `scripts/secrets-edit.sh common`.
 - Cloudflare R2 tokens in `clode-claw/r2.tf` use `sha256(token.value)` as the secret access key — that's the documented R2 S3-compat scheme, not a bug.
 - The groceries-ingestion S3 bucket has a 1-day expiration lifecycle rule; raw scrape data is ephemeral by design.
 - Provider versions are pinned (aws 5.46.0, linode 3.10.0, google 7.34.0, cloudflare ~>5). Bumping them requires re-running `terraform init -upgrade` and is likely to surface schema changes — do it deliberately, not as a drive-by.

@@ -1,6 +1,6 @@
 
 provider "cloudflare" {
-  api_token = var.terraform-management.cf-token
+  api_token = local.cloudflare["token"]
 }
 
 provider "aws" {
@@ -16,10 +16,10 @@ provider "aws" {
 }
 
 provider "linode" {
-  token = var.terraform-management.linode-token
+  token = local.linode["token"]
 }
 
 provider "mongodbatlas" {
-  public_key  = var.terraform-management.mongodbatlas-public-key
-  private_key = var.terraform-management.mongodbatlas-private-key
+  public_key  = local.mongodbatlas["public-key"]
+  private_key = local.mongodbatlas["private-key"]
 }
