@@ -29,7 +29,8 @@ Single-module work: you can also `cd <module>/ && terraform ...` only for `valid
 - `.aws_credentials` — AWS shared-credentials file. Referenced by *both* the AWS provider (`provider.tf`) and the S3 backend (`version.tf`). Default profile is used.
 - Sensitive variables are **not** stored locally — they live in AWS Secrets Manager (one secret per module; see the "Secrets" section below). There is no `terraform.tfvars.json` anymore. `.aws_credentials` remains gitignored — never commit it.
 - `~/.ssh/github.pub` — read by `credentials.tf` and injected as the MacBook Air SSH key into Linode.
-- `pyfun/certs/pyfun-backend-v2.clo5de.info.{key,pem}` — TLS cert/key for the PyFun API Gateway custom domain; the paths come from the `pyfun` secret's `aws-cert-key-path` / `aws-cert-pem-path`. (Still a local secret — the cert/key content is not yet migrated into Secrets Manager.)
+
+(`.aws_credentials` and `~/.ssh/github.pub` are the only local files now — there is no local cert or tfvars anymore.)
 
 ## Secrets (AWS Secrets Manager)
 
@@ -41,6 +42,13 @@ There are 13 secrets: the former `terraform-management` catch-all is split by pr
 - Edit one value: `scripts/secrets-edit.sh <name>` (fetch → `$EDITOR` → push a new version).
 - Bulk-seed from a `terraform.tfvars.json` (first-time migration or disaster recovery): `scripts/secrets-push.sh`.
 - Caveat: read values are copied into the S3 state. The state's encryption + access control is the real security boundary — not the absence of a local file.
+
+### PyFun TLS certificate
+
+PyFun's API Gateway custom domain (`pyfun-backend-v2.clo5de.info`) uses an **ACM-issued, DNS-validated** certificate defined at root in `pyfun-cert.tf`. It spans two providers — `aws` for issuance (must be in the API Gateway's region, `ap-northeast-1`) and `cloudflare` for the validation record in the `clo5de.info` zone — so it lives at root and its validated ARN is injected into `module.PyFun`. ACM auto-renews it; no private key is stored in Terraform or on disk.
+
+- The previous **imported** cert (arn `eabee32f`, valid to 2039) is no longer managed by Terraform (`state rm`'d, left alive in ACM). Both it and the new cert are `InUseBy` production load balancers in a **separate AWS account** (`969236854626`, `prod-nrt-1-cdtls-*`) — some external TLS-terminating platform auto-attaches ACM certs for this domain. Consequence: the cert auto-renews in place fine, but **cannot be destroyed/replaced while in use** (`terraform destroy` of it fails with `ResourceInUseException` — this is what broke the first migration apply).
+- The imported cert's private key + body are cold-backed-up in the `private-cloud/pyfun-legacy-cert` secret (**not** read by Terraform; kept only because ACM cannot export an imported cert's key).
 
 ## Architecture: how the modules fit together
 
