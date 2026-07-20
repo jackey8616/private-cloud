@@ -24,13 +24,12 @@ terraform output -json clode-claw           # sensitive outputs — must pass th
 
 Single-module work: you can also `cd <module>/ && terraform ...` only for `validate`/`fmt`. Real `plan`/`apply` must run from root because state, backend, and cross-module wiring live there.
 
-## Required local files (gitignored, must exist before `init`/`plan`)
+## Local prerequisites & AWS auth
 
-- `.aws_credentials` — AWS shared-credentials file. Referenced by *both* the AWS provider (`provider.tf`) and the S3 backend (`version.tf`). Default profile is used.
-- Sensitive variables are **not** stored locally — they live in AWS Secrets Manager (one secret per module; see the "Secrets" section below). There is no `terraform.tfvars.json` anymore. `.aws_credentials` remains gitignored — never commit it.
-- `~/.ssh/github.pub` — read by `credentials.tf` and injected as the MacBook Air SSH key into Linode.
-
-(`.aws_credentials` and `~/.ssh/github.pub` are the only local files now — there is no local cert or tfvars anymore.)
+- **AWS auth uses the default credential chain** — `provider.tf` and the `version.tf` backend no longer pin a credentials file or profile. Authenticate on any machine with **IAM Identity Center (SSO)**: `aws sso login`, then `export AWS_PROFILE=<your-sso-profile>` (profile names are per-machine, e.g. `pc-sso-rowan-air`) and `terraform init -reconfigure`. The S3 backend, both `aws` providers, and the Secrets Manager reads all resolve from that. A static `.aws_credentials` file still works if you point `AWS_SHARED_CREDENTIALS_FILE`/`AWS_PROFILE` at it, but is no longer required — and stays gitignored, never commit it.
+- **GCP auth** is `gcloud auth application-default login` (interactive). AWS SSO + gcloud ADC = deploy from any machine with no secret file carried.
+- Sensitive variables are **not** stored locally — they live in AWS Secrets Manager (one secret per module; see the "Secrets" section below). There is no `terraform.tfvars.json` anymore.
+- `~/.ssh/github.pub` — read by `credentials.tf` and injected as the MacBook Air SSH key into Linode (a public key, not a secret).
 
 ## Secrets (AWS Secrets Manager)
 
