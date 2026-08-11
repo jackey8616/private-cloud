@@ -16,6 +16,11 @@ output "clode-tools" {
   sensitive = true
 }
 
+output "proma" {
+  value     = module.Proma.proma
+  sensitive = true
+}
+
 output "silverfish" {
   value = merge(
     module.Silverfish.silverfish,

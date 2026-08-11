@@ -32,6 +32,32 @@ resource "cloudflare_dns_record" "vpn-jp" {
   ttl     = 60
 }
 
+# PROMA — two records, one box. **DNS only (gray cloud), and here that is a requirement rather
+# than the habit the two records above follow:** Caddy on the instance gets its certificates from
+# an HTTP-01 challenge, which is Let's Encrypt connecting to this IP on port 80. Proxied, the
+# challenge would terminate at Cloudflare, and neither hostname would ever hold a certificate —
+# while looking, from a browser, exactly like one that does.
+#
+# Short TTL because any configuration change replaces the instance (proma/instance.tf says why
+# that is the accepted shape), and a new IP behind a day-long TTL is an outage nobody can shorten.
+resource "cloudflare_dns_record" "proma" {
+  zone_id = cloudflare_zone.clo5de-info.id
+  name    = var.proma-webhook-hostname
+  content = var.proma-ip
+  type    = "A"
+  proxied = false
+  ttl     = 60
+}
+
+resource "cloudflare_dns_record" "proma-window" {
+  zone_id = cloudflare_zone.clo5de-info.id
+  name    = var.proma-window-hostname
+  content = var.proma-ip
+  type    = "A"
+  proxied = false
+  ttl     = 60
+}
+
 resource "cloudflare_dns_record" "knight-strike" {
   zone_id = cloudflare_zone.clo5de-info.id
   name    = "knight-strike"
