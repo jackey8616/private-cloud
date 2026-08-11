@@ -1,5 +1,12 @@
 locals {
   github-org-name = "jackey8616"
+
+  # PROMA's two hostnames, at root because three places have to agree on them and none of them
+  # may derive its own: the DNS records (module.DNS), the certificates and reverse proxy on the
+  # box (module.Proma → Caddy), and LINE_LOGIN_CALLBACK_URL, which the LINE console compares byte
+  # for byte. Under dev. while v0 is being sold with a member in the room.
+  proma-webhook-hostname = "proma.dev.clo5de.info"
+  proma-window-hostname  = "proma-window.dev.clo5de.info"
 }
 
 module "GitHubOIDC" {
@@ -32,6 +39,9 @@ module "DNS" {
   vpn-ip                      = module.Clode-Tools.clode-tools.vpn.ip
   vpn-jp-ip                   = module.Clode-Tools.clode-tools.vpn-jp.ip
   silverfish-backend-hostname = module.Silverfish.silverfish.backend.api_cname_target
+  proma-ip                    = module.Proma.public_ipv4
+  proma-webhook-hostname      = local.proma-webhook-hostname
+  proma-window-hostname       = local.proma-window-hostname
 }
 
 module "Clode-Tools" {
@@ -92,6 +102,27 @@ module "ClodeClaw" {
   providers = {
     cloudflare = cloudflare
     linode     = linode
+  }
+}
+
+module "Proma" {
+  source = "./proma"
+  ssh_public_keys = [
+    linode_sshkey.MacBookAir.ssh_key
+  ]
+  # SSH only. 80/443 are open to the world in this module, because the sender of a 投遞 is the
+  # LINE platform and it publishes no source range — what guards that endpoint is 來源證明,
+  # not an allowlist (proma/firewall.tf).
+  allowed_connection_ips = local.common["often-login-ips"]
+  instance-env           = local.proma["instance-env"]
+  webhook-hostname       = local.proma-webhook-hostname
+  window-hostname        = local.proma-window-hostname
+  # For the instance's read-only deploy key, which this module registers itself so that it exists
+  # before the box boots and clones (proma/deploy-key.tf).
+  github-org-name = local.github-org-name
+  github-token    = local.github["token"]
+  providers = {
+    linode = linode
   }
 }
 

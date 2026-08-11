@@ -71,6 +71,14 @@ data "aws_secretsmanager_secret_version" "clode_claw" {
   secret_id = "private-cloud/clode-claw"
 }
 
+# PROMA's is the one secret here that holds another party's data path rather than only our own
+# credentials: 客戶資料 lives behind the two Neon URLs in it (ADR-0002 bounds how long, and the
+# bound counts copies). proma/README.md lists every key and which of them the module derives
+# instead of reading.
+data "aws_secretsmanager_secret_version" "proma" {
+  secret_id = "private-cloud/proma"
+}
+
 locals {
   cloudflare   = jsondecode(data.aws_secretsmanager_secret_version.cloudflare.secret_string)
   linode       = jsondecode(data.aws_secretsmanager_secret_version.linode.secret_string)
@@ -86,4 +94,5 @@ locals {
   groceries_nz = jsondecode(data.aws_secretsmanager_secret_version.groceries_nz.secret_string)
   silverfish   = jsondecode(data.aws_secretsmanager_secret_version.silverfish.secret_string)
   clode_claw   = jsondecode(data.aws_secretsmanager_secret_version.clode_claw.secret_string)
+  proma        = jsondecode(data.aws_secretsmanager_secret_version.proma.secret_string)
 }
