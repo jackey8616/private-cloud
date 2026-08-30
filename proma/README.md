@@ -61,9 +61,13 @@ object whose members become `/etc/proma/env` verbatim:
 above except the last is documented there at length. `CLAUDE_CODE_OAUTH_TOKEN` is not, because a
 developer's machine logs in interactively and a box cannot — make one with `claude setup-token`.
 
-**Three keys are derived and must not be put here**: `LINE_LOGIN_CALLBACK_URL` (computed from
+**Six keys are derived and must not be put here**: `LINE_LOGIN_CALLBACK_URL` (computed from
 `window-hostname`, so the DNS record, the certificate and the console value cannot drift apart),
-`PORT` and `CASE_WINDOW_PORT` (the module owns both, because Caddy has to agree with them).
+`PORT` and `CASE_WINDOW_PORT` (the module owns both, because Caddy has to agree with them), and
+`TIDYING_HOST` / `TIDYING_PORT` / `TIDYING_ENTRANCE_URL` (ADR-0006's private entrance — the
+daemon binds the first two and 案窗 dials the third, so one value in `instance.tf` feeds all
+three rather than three that can disagree). None of the six is a secret; they are here because
+this file is where the two processes are wired to each other.
 
 **The two Neon URLs are not the same credentials, and nothing in the code can tell.**
 `CASE_WINDOW_DATABASE_URL` has to be a read replica endpoint with a `select`-only role — pasting
