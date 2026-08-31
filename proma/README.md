@@ -61,9 +61,13 @@ object whose members become `/etc/proma/env` verbatim:
 above except the last is documented there at length. `CLAUDE_CODE_OAUTH_TOKEN` is not, because a
 developer's machine logs in interactively and a box cannot — make one with `claude setup-token`.
 
-**Three keys are derived and must not be put here**: `LINE_LOGIN_CALLBACK_URL` (computed from
+**Six keys are derived and must not be put here**: `LINE_LOGIN_CALLBACK_URL` (computed from
 `window-hostname`, so the DNS record, the certificate and the console value cannot drift apart),
-`PORT` and `CASE_WINDOW_PORT` (the module owns both, because Caddy has to agree with them).
+`PORT` and `CASE_WINDOW_PORT` (the module owns both, because Caddy has to agree with them), and
+`TIDYING_HOST` / `TIDYING_PORT` / `TIDYING_ENTRANCE_URL` (ADR-0006's private entrance — the
+daemon binds the first two and 案窗 dials the third, so one value in `instance.tf` feeds all
+three rather than three that can disagree). None of the six is a secret; they are here because
+this file is where the two processes are wired to each other.
 
 **The two Neon URLs are not the same credentials, and nothing in the code can tell.**
 `CASE_WINDOW_DATABASE_URL` has to be a read replica endpoint with a `select`-only role — pasting
@@ -120,6 +124,21 @@ rebuilds the box. Everything that must outlive it is in Neon; what does not surv
 `/home/proma/.claude`, so every case's next 回合 starts a fresh 對話 rather than continuing one
 (ADR-0001 §4 prices that as 語氣, not 需求). Editing `/etc/proma/env` in place would avoid the
 rebuild and cost the guarantee that the state describes the box.
+
+**The first 回合 after a rebuild fails, unless you clear one column.** `cases.session_id` outlives
+the transcript it names, so the next turn `--resume`s a 對話 that is no longer on disk: the CLI
+exits 1 before reaching the API, the 紀錄 reads `failed` / `never-ran` — free, and honest — and the
+group is told 「PROMA 這一回合沒有跑完」. The application is right not to detect this
+(`src/engine/session.ts`, 決策一: 失敗就換一個,不修、不重試、不告警), which is why the line to
+spend is here rather than there:
+
+```sql
+update cases set session_id = null;   -- after the apply, before the next message arrives
+```
+
+The transcripts are gone either way; this only decides whether the next 回合 opens a new 對話 or
+first burns one on a dead `--resume`. Measured on the 2026-08-30 rebuild: one 回合, $0 spent, and
+one visible failure in front of the 企業主 — per case, every rebuild.
 
 ## Known caveats
 

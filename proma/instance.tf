@@ -12,10 +12,28 @@ locals {
   # console's copy is the one thing Terraform cannot reach; README.md says so out loud.
   callback-url = "https://${var.window-hostname}/login/line/callback"
 
+  # 整理's entrance (ADR-0006): the daemon's second socket, and what the 案窗 process dials when
+  # a 成員 presses the button. Derived for the same reason the ports are — it is not a secret,
+  # and two sides have to agree: main.ts binds TIDYING_HOST:TIDYING_PORT, case-window.ts dials
+  # TIDYING_ENTRANCE_URL. One value feeds all three so they cannot drift apart.
+  #
+  # It stays on loopback, and that is the whole of what makes this entrance private. ADR-0006
+  # asks for both processes on one machine or one private segment; here they are two units on
+  # this box, so nothing outside it can reach 8082 — and firewall.tf never has to know, because
+  # the socket is not bound anywhere it could be asked about.
+  #
+  # case-window.ts calls required() on the URL, so leaving it out is not a degraded window: the
+  # unit exits 2 at boot, and from outside that looks exactly like the daemon being down.
+  tidying-host = "127.0.0.1"
+  tidying-port = 8082
+
   env = merge(var.instance-env, {
     LINE_LOGIN_CALLBACK_URL = local.callback-url
     PORT                    = tostring(local.webhook-port)
     CASE_WINDOW_PORT        = tostring(local.window-port)
+    TIDYING_HOST            = local.tidying-host
+    TIDYING_PORT            = tostring(local.tidying-port)
+    TIDYING_ENTRANCE_URL    = "http://${local.tidying-host}:${local.tidying-port}"
   })
 
   # systemd's EnvironmentFile format: one KEY=value per line. Values are quoted because a Neon
